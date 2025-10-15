@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": false,
+    "sourceMap": true,
+    "paths": {
+      "@zoltraak/types/*": ["../../packages/types/dist/*"],
+      "@zoltraak/utils/*": ["../../packages/utils/dist/*"]
+    }
+  }
+}

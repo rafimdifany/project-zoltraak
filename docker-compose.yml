@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: zoltraak-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: zoltraak
+      POSTGRES_USER: zoltraak
+      POSTGRES_PASSWORD: devpassword
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - zoltraak-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: zoltraak-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - zoltraak-network
+
+networks:
+  zoltraak-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
