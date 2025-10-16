@@ -52,8 +52,8 @@ const navLinks = [
 export default function HomePage() {
   return (
     <div className="pb-24 pt-10">
-      <div className="sticky top-6 z-50 px-4 sm:px-6 lg:px-8">
-        <header className="mx-auto flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-background/80 px-4 py-3 shadow-sm backdrop-blur sm:px-6 lg:max-w-6xl">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-background/80 px-4 py-3 shadow-sm backdrop-blur sm:px-6">
           <Link href="/" className="order-1 flex items-center gap-2 text-base font-semibold text-foreground">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/90 text-lg text-primary-foreground">
               Z
@@ -82,8 +82,7 @@ export default function HomePage() {
             ))}
           </nav>
         </header>
-      </div>
-      <main className="mx-auto max-w-6xl space-y-24 px-4 pt-16 sm:px-6 lg:px-8">
+        <main className="space-y-24 pt-16">
           <section
             id="overview"
             className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-background via-background to-primary/10 p-10 shadow-sm sm:p-16"
@@ -300,6 +299,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+    </div>
   </div>
   );
 }
