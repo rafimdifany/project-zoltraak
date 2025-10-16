@@ -42,83 +42,124 @@ const metricHighlights = [
   { metric: '<12 hrs', label: 'time to deploy your first automated workflow.' },
 ];
 
+const navLinks = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Product Suite', href: '#product' },
+  { label: 'Platform', href: '#platform' },
+  { label: 'Customers', href: '#customers' },
+];
+
 export default function HomePage() {
   return (
-    <div className="pb-24 pt-16">
-      <div className="mx-auto max-w-6xl space-y-24 px-4 sm:px-6 lg:px-8">
-        <section className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-background via-background to-primary/10 p-10 shadow-sm sm:p-16">
-          <div className="absolute inset-y-0 right-[-10%] hidden w-1/2 rounded-full bg-primary/20 blur-3xl lg:block" />
-          <div className="relative grid gap-12 lg:grid-cols-[1.2fr_minmax(0,0.9fr)] lg:items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1 text-xs font-medium uppercase tracking-widest text-primary">
-                Zoltraak Finance Cloud
-              </div>
-              <div className="space-y-6">
-                <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-                  Orchestrate every dollar from a single financial command center.
-                </h1>
-                <p className="max-w-2xl text-lg text-muted-foreground">
-                  Zoltraak unifies all of your financial apps into one intelligent platform, giving leaders live
-                  visibility, teams automated workflows, and stakeholders real-time answers without spreadsheets.
-                </p>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/register"
-                  className="rounded-md bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-                >
-                  Start free workspace
-                </Link>
-                <Link
-                  href="/contact"
-                  className="rounded-md border border-border px-6 py-3 text-center text-sm font-semibold text-foreground transition hover:bg-muted"
-                >
-                  Talk with finance expert
-                </Link>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-                <span>Trusted by finance teams at</span>
-                <span className="font-semibold text-foreground">Atlas Labs</span>
-                <span className="font-semibold text-foreground">Northwind Commerce</span>
-                <span className="font-semibold text-foreground">Aurora Ventures</span>
-                <span className="font-semibold text-foreground">Sierra Medical</span>
-              </div>
-            </div>
-            <div className="relative isolate">
-              <div className="absolute inset-0 -z-10 rounded-2xl bg-primary/20 blur-2xl" />
-              <div className="space-y-5 rounded-2xl border bg-card p-6 shadow-xl">
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>Global cash position</span>
-                  <span>Live</span>
+    <div className="pb-24 pt-10">
+      <div className="sticky top-6 z-50 px-4 sm:px-6 lg:px-8">
+        <header className="mx-auto flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-background/80 px-4 py-3 shadow-sm backdrop-blur sm:px-6 lg:max-w-6xl">
+          <Link href="/" className="order-1 flex items-center gap-2 text-base font-semibold text-foreground">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/90 text-lg text-primary-foreground">
+              Z
+            </span>
+            <span>Zoltraak</span>
+          </Link>
+          <div className="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:ml-0">
+            <Link
+              href="/login"
+              className="rounded-md px-4 py-2 text-sm font-semibold text-foreground transition hover:text-foreground/80"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+            >
+              Get started
+            </Link>
+          </div>
+          <nav className="order-3 flex w-full flex-wrap items-center gap-4 border-t border-border/60 pt-3 text-sm font-medium text-muted-foreground sm:order-2 sm:w-auto sm:flex-1 sm:justify-center sm:border-none sm:pt-0 lg:flex-none lg:gap-6">
+            {navLinks.map((item) => (
+              <Link key={item.href} href={item.href} className="transition hover:text-foreground">
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </header>
+      </div>
+      <main className="mx-auto max-w-6xl space-y-24 px-4 pt-16 sm:px-6 lg:px-8">
+          <section
+            id="overview"
+            className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-background via-background to-primary/10 p-10 shadow-sm sm:p-16"
+          >
+            <div className="absolute inset-y-0 right-[-10%] hidden w-1/2 rounded-full bg-primary/20 blur-3xl lg:block" />
+            <div className="relative grid gap-12 lg:grid-cols-[1.2fr_minmax(0,0.9fr)] lg:items-center">
+              <div className="space-y-8">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1 text-xs font-medium uppercase tracking-widest text-primary">
+                  Zoltraak Finance Cloud
                 </div>
-                <p className="text-3xl font-semibold text-foreground">$38,742,910</p>
-                <div className="grid gap-3 rounded-xl border bg-background p-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Working capital</span>
-                    <span className="font-medium text-emerald-500">+$1,204,320</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Burn rate</span>
-                    <span className="font-medium text-rose-500">$482,110</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Runway</span>
-                    <span className="font-medium text-primary">18.4 months</span>
-                  </div>
-                </div>
-                <div className="rounded-xl border bg-background p-4 text-sm">
-                  <p className="font-semibold text-foreground">AI briefing</p>
-                  <p className="text-muted-foreground">
-                    Cash reserves increased 4.2% week-over-week. Vendor payments automated with new approval flow for
-                    EMEA entities. Suggest reviewing Pricing Playbook scenario B.
+                <div className="space-y-6">
+                  <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+                    Orchestrate every dollar from a single financial command center.
+                  </h1>
+                  <p className="max-w-2xl text-lg text-muted-foreground">
+                    Zoltraak unifies all of your financial apps into one intelligent platform, giving leaders live
+                    visibility, teams automated workflows, and stakeholders real-time answers without spreadsheets.
                   </p>
                 </div>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href="/register"
+                    className="rounded-md bg-primary px-6 py-3 text-center text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                  >
+                    Start free workspace
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="rounded-md border border-border px-6 py-3 text-center text-sm font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    Talk with finance expert
+                  </Link>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+                  <span>Trusted by finance teams at</span>
+                  <span className="font-semibold text-foreground">Atlas Labs</span>
+                  <span className="font-semibold text-foreground">Northwind Commerce</span>
+                  <span className="font-semibold text-foreground">Aurora Ventures</span>
+                  <span className="font-semibold text-foreground">Sierra Medical</span>
+                </div>
+              </div>
+              <div className="relative isolate">
+                <div className="absolute inset-0 -z-10 rounded-2xl bg-primary/20 blur-2xl" />
+                <div className="space-y-5 rounded-2xl border bg-card p-6 shadow-xl">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Global cash position</span>
+                    <span>Live</span>
+                  </div>
+                  <p className="text-3xl font-semibold text-foreground">$38,742,910</p>
+                  <div className="grid gap-3 rounded-xl border bg-background p-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Working capital</span>
+                      <span className="font-medium text-emerald-500">+$1,204,320</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Burn rate</span>
+                      <span className="font-medium text-rose-500">$482,110</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Runway</span>
+                      <span className="font-medium text-primary">18.4 months</span>
+                    </div>
+                  </div>
+                  <div className="rounded-xl border bg-background p-4 text-sm">
+                    <p className="font-semibold text-foreground">AI briefing</p>
+                    <p className="text-muted-foreground">
+                      Cash reserves increased 4.2% week-over-week. Vendor payments automated with new approval flow for
+                      EMEA entities. Suggest reviewing Pricing Playbook scenario B.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section className="space-y-10">
+        <section id="product" className="space-y-10">
           <div className="space-y-4 text-center">
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">A suite of financial apps that work in concert</h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
@@ -144,7 +185,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="grid gap-10 rounded-3xl border bg-card p-8 shadow-sm lg:grid-cols-[1.1fr_minmax(0,1fr)] lg:p-12">
+        <section id="platform" className="grid gap-10 rounded-3xl border bg-card p-8 shadow-sm lg:grid-cols-[1.1fr_minmax(0,1fr)] lg:p-12">
           <div className="space-y-6">
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">Operating system</p>
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -194,7 +235,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="grid gap-10 lg:grid-cols-[1fr_minmax(0,0.9fr)] lg:items-center">
+        <section id="customers" className="grid gap-10 lg:grid-cols-[1fr_minmax(0,0.9fr)] lg:items-center">
           <div className="space-y-6 rounded-3xl border bg-card p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">Customer spotlight</p>
             <p className="text-lg text-muted-foreground">
@@ -258,7 +299,7 @@ export default function HomePage() {
             </Link>
           </div>
         </section>
-      </div>
-    </div>
+      </main>
+  </div>
   );
 }
