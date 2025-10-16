@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Zoltraak Dashboard',
+    default: 'Lunaris | Financial Management for your needs',
     template: '%s | Zoltraak'
   },
   description: 'Personal finance intelligence dashboard with budgeting, assets, and insights.',

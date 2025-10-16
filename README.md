@@ -19,3 +19,5 @@ Phase 1 for the Zoltraak intelligent financial dashboard. This workspace hosts t
 3. Configure environment variables (`apps/backend/.env`, `apps/frontend/.env.local`)
 
 See the backend and frontend README files (to be added) for detailed instructions.
+
+Apps name : Lunaris
