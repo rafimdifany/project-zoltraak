@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { useAuth } from '@/contexts/auth-context';
 import { useLogin } from '@/hooks/use-auth';
 import { getErrorMessage } from '@/lib/http-error';
@@ -55,7 +56,10 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="mx-auto flex min-h-[600px] w-full max-w-md items-center justify-center">
+    <div className="relative mx-auto flex min-h-[600px] w-full max-w-md items-center justify-center">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Welcome back</CardTitle>

@@ -8,6 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from './theme-toggle';
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -94,6 +95,7 @@ export function AppShell({ children }: AppShellProps) {
                 <p className="text-xs uppercase text-muted-foreground">{user.role.toLowerCase()}</p>
               ) : null}
             </div>
+            <ThemeToggle />
             <Link
               href="/settings"
               className="rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition hover:bg-secondary/80"

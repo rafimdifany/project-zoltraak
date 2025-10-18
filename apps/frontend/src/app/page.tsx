@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { ThemeToggle } from '@/components/layout/theme-toggle';
+
 const featureHighlights = [
   {
     title: 'Unified Cash Control',
@@ -61,6 +63,7 @@ export default function HomePage() {
             <span>Zoltraak</span>
           </Link>
           <div className="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:ml-0">
+            <ThemeToggle />
             <Link
               href="/login"
               className="rounded-md px-4 py-2 text-sm font-semibold text-foreground transition hover:text-foreground/80"
