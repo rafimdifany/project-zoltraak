@@ -2,14 +2,18 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/auth-context';
+import { useRegister } from '@/hooks/use-auth';
+import { getErrorMessage } from '@/lib/http-error';
 
 const registerSchema = z
   .object({
@@ -26,6 +30,10 @@ const registerSchema = z
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { isAuthenticated, isInitializing } = useAuth();
+  const registerMutation = useRegister();
+  const [formError, setFormError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -39,13 +47,24 @@ export default function RegisterPage() {
       confirmPassword: ''
     }
   });
-  const [isSubmitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isInitializing && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, isInitializing, router]);
 
   const onSubmit = handleSubmit(async (values) => {
-    setSubmitting(true);
-    // TODO: integrate with backend registration endpoint
-    console.log('Register form submit', values);
-    setTimeout(() => setSubmitting(false), 1000);
+    setFormError(null);
+    try {
+      await registerMutation.mutateAsync({
+        displayName: values.displayName,
+        email: values.email,
+        password: values.password
+      });
+    } catch (error) {
+      setFormError(getErrorMessage(error, 'Unable to create your account. Please try again.'));
+    }
   });
 
   return (
@@ -62,9 +81,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <Label htmlFor="displayName">Name</Label>
               <Input id="displayName" placeholder="Alex Morgan" {...register('displayName')} />
-              {errors.displayName ? (
-                <p className="text-xs text-rose-500">{errors.displayName.message}</p>
-              ) : null}
+              {errors.displayName ? <p className="text-xs text-rose-500">{errors.displayName.message}</p> : null}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
@@ -73,17 +90,15 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="••••••••" {...register('password')} />
-              {errors.password ? (
-                <p className="text-xs text-rose-500">{errors.password.message}</p>
-              ) : null}
+              <Input id="password" type="password" placeholder="********" {...register('password')} />
+              {errors.password ? <p className="text-xs text-rose-500">{errors.password.message}</p> : null}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="••••••••"
+                placeholder="********"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword ? (
@@ -91,10 +106,11 @@ export default function RegisterPage() {
               ) : null}
             </div>
           </form>
+          {formError ? <p className="text-sm text-rose-500">{formError}</p> : null}
         </CardContent>
         <CardFooter className="flex flex-col gap-3">
-          <Button form="register-form" type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? 'Creating account…' : 'Create account'}
+          <Button form="register-form" type="submit" className="w-full" disabled={registerMutation.isPending}>
+            {registerMutation.isPending ? 'Creating account...' : 'Create account'}
           </Button>
           <p className="text-center text-xs text-muted-foreground">
             Already have an account?{' '}

@@ -1,10 +1,12 @@
 'use client';
 
-import { LayoutDashboard, PiggyBank, Receipt, Wallet } from 'lucide-react';
+import { LayoutDashboard, Loader2, PiggyBank, Receipt, Wallet } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useMemo } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
 
 type AppShellProps = {
@@ -19,7 +21,20 @@ const navItems = [
 ];
 
 export function AppShell({ children }: AppShellProps) {
+  const router = useRouter();
   const pathname = usePathname();
+  const { user, isAuthenticated, isInitializing, logout } = useAuth();
+
+  useEffect(() => {
+    if (!isInitializing && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, isInitializing, router]);
+
+  const handleLogout = () => {
+    logout();
+    router.replace('/login');
+  };
 
   const activePath = useMemo(() => {
     if (!pathname) {
@@ -29,6 +44,18 @@ export function AppShell({ children }: AppShellProps) {
     const match = navItems.find((item) => pathname.startsWith(item.href));
     return match?.href ?? '/dashboard';
   }, [pathname]);
+
+  if (isInitializing) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -62,19 +89,22 @@ export function AppShell({ children }: AppShellProps) {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="hidden text-right md:block">
+              <p className="text-sm font-semibold text-foreground">{user?.displayName ?? user?.email}</p>
+              {user?.role ? (
+                <p className="text-xs uppercase text-muted-foreground">{user.role.toLowerCase()}</p>
+              ) : null}
+            </div>
             <Link
               href="/settings"
               className="rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition hover:bg-secondary/80"
             >
               Settings
             </Link>
-            <Link
-              href="/login"
-              className="rounded-md border px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
-            >
+            <Button variant="outline" onClick={handleLogout}>
               Logout
-            </Link>
+            </Button>
           </div>
         </div>
       </header>
