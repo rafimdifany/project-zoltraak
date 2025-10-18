@@ -57,10 +57,26 @@ export function AppShell({ children }: AppShellProps) {
     return null;
   }
 
+  const navLinks = navItems.map(({ href, label, icon: Icon }) => (
+    <Link
+      key={href}
+      href={href}
+      className={cn(
+        'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+        activePath === href
+          ? 'bg-primary text-primary-foreground shadow-sm'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+      )}
+    >
+      <Icon className="h-4 w-4" />
+      {label}
+    </Link>
+  ));
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b bg-card/50 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <span>ZK</span>
@@ -70,24 +86,6 @@ export function AppShell({ children }: AppShellProps) {
               <span className="block text-xs text-muted-foreground">Finance intelligence</span>
             </div>
           </Link>
-
-          <nav className="hidden items-center gap-1 md:flex">
-            {navItems.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  activePath === href
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                {label}
-              </Link>
-            ))}
-          </nav>
 
           <div className="flex items-center gap-3">
             <div className="hidden text-right md:block">
@@ -110,7 +108,31 @@ export function AppShell({ children }: AppShellProps) {
       </header>
 
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">{children}</div>
+        <div className="flex w-full flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8 md:flex-row">
+          <aside className="md:w-56">
+            <div className="rounded-2xl border bg-card p-4 shadow-sm">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Navigation</p>
+              <nav className="hidden flex-col gap-1 md:flex">{navLinks}</nav>
+              <nav className="flex flex-wrap gap-2 md:hidden">
+                {navItems.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      'rounded-full border px-3 py-1 text-sm font-medium transition',
+                      activePath === href
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
+                    )}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </aside>
+          <section className="flex-1">{children}</section>
+        </div>
       </main>
     </div>
   );
