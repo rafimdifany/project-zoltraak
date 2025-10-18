@@ -15,6 +15,7 @@ type ThemeContextValue = {
   theme: Theme;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
+  isReady: boolean;
 };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
@@ -44,7 +45,8 @@ const applyThemeClass = (theme: Theme) => {
 };
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>('light');
+  const [theme, setThemeState] = useState<Theme>('dark');
+  const [isReady, setIsReady] = useState(false);
   const isInitializedRef = useRef(false);
   const userPreferenceRef = useRef(false);
 
@@ -59,6 +61,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     applyThemeClass(initialTheme);
     isInitializedRef.current = true;
     userPreferenceRef.current = stored !== null;
+    setIsReady(true);
 
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     const handleMediaChange = (event: MediaQueryListEvent) => {
@@ -106,7 +109,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const value: ThemeContextValue = {
     theme,
     toggleTheme,
-    setTheme
+    setTheme,
+    isReady
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
