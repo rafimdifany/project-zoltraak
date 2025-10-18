@@ -5,12 +5,19 @@ services:
     image: postgres:16-alpine
     container_name: zoltraak-postgres
     restart: unless-stopped
+    command:
+      - postgres
+      - -c
+      - timezone=Asia/Jakarta
+      - -c
+      - log_timezone=Asia/Jakarta
     ports:
       - "5432:5432"
     environment:
       POSTGRES_DB: zoltraak
       POSTGRES_USER: zoltraak
       POSTGRES_PASSWORD: devpassword
+      TZ: Asia/Jakarta
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
