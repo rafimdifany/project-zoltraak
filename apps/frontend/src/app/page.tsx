@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { DownloadMenu } from '@/components/landing/download-menu';
 
 const featureHighlights = [
   {
@@ -55,7 +56,7 @@ export default function HomePage() {
   return (
     <div className="pb-24 pt-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-background/80 px-4 py-3 shadow-sm backdrop-blur sm:px-6">
+        <header className="relative z-30 flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-background/80 px-4 py-3 shadow-sm backdrop-blur sm:px-6">
           <Link href="/" className="order-1 flex items-center gap-2 text-base font-semibold text-foreground">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/90 text-lg text-primary-foreground">
               Z
@@ -70,12 +71,7 @@ export default function HomePage() {
             >
               Sign in
             </Link>
-            <Link
-              href="/register"
-              className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
-            >
-              Get started
-            </Link>
+            <DownloadMenu />
           </div>
           <nav className="order-3 flex w-full flex-wrap items-center gap-4 border-t border-border/60 pt-3 text-sm font-medium text-muted-foreground sm:order-2 sm:w-auto sm:flex-1 sm:justify-center sm:border-none sm:pt-0 lg:flex-none lg:gap-6">
             {navLinks.map((item) => (
@@ -88,7 +84,7 @@ export default function HomePage() {
         <main className="space-y-24 pt-16">
           <section
             id="overview"
-            className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-background via-background to-primary/10 p-10 shadow-sm sm:p-16"
+            className="relative overflow-visible rounded-3xl border bg-gradient-to-br from-background via-background to-primary/10 p-10 shadow-sm sm:p-16"
           >
             <div className="absolute inset-y-0 right-[-10%] hidden w-1/2 rounded-full bg-primary/20 blur-3xl lg:block" />
             <div className="relative grid gap-12 lg:grid-cols-[1.2fr_minmax(0,0.9fr)] lg:items-center">
