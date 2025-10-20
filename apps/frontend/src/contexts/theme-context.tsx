@@ -26,14 +26,6 @@ type ThemeProviderProps = {
 
 const STORAGE_KEY = 'zoltraak.theme';
 
-const getSystemTheme = (): Theme => {
-  if (typeof window === 'undefined') {
-    return 'light';
-  }
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-};
-
 const applyThemeClass = (theme: Theme) => {
   if (typeof document === 'undefined') {
     return;
@@ -56,7 +48,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }
 
     const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const initialTheme = stored ?? getSystemTheme();
+    const initialTheme = stored ?? 'dark';
     setThemeState(initialTheme);
     applyThemeClass(initialTheme);
     isInitializedRef.current = true;

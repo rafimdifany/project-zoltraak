@@ -1,10 +1,28 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 
 import { Providers } from './providers';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
+
+const themeInitScript = `
+(() => {
+  try {
+    const storageKey = 'zoltraak.theme';
+    const stored = window.localStorage.getItem(storageKey);
+    const theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+    const root = document.documentElement;
+    root.classList.toggle('dark', theme === 'dark');
+    root.style.setProperty('color-scheme', theme);
+  } catch {
+    const root = document.documentElement;
+    root.classList.add('dark');
+    root.style.setProperty('color-scheme', 'dark');
+  }
+})();
+`;
 
 export const metadata: Metadata = {
   title: {
@@ -17,7 +35,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
+      </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>
