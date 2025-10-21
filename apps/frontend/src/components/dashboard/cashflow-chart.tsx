@@ -1,7 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { DashboardTransaction } from '@zoltraak/types';
+import { cn } from '@/lib/utils';
 
 type CashflowChartProps = {
   transactions: DashboardTransaction[];
@@ -23,8 +25,19 @@ const RANGE_OPTIONS = [
   { label: '30 days', value: 30 }
 ] as const;
 
+type TooltipState = {
+  index: number;
+  income: number;
+  expense: number;
+  dateLabel: string;
+  x: number;
+  y: number;
+};
+
 export function CashflowChart({ transactions }: CashflowChartProps) {
   const [rangeDays, setRangeDays] = useState<(typeof RANGE_OPTIONS)[number]['value']>(7);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
 
   const formatCurrency = (value: number) =>
     value.toLocaleString('en-US', {
@@ -90,6 +103,27 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
   );
 
   const chartWidth = rangeDays <= 14 ? '100%' : `${rangeDays * 56}px`;
+
+  const showTooltip = useCallback(
+    (index: number, point: ChartPoint, target: HTMLElement) => {
+      const rect = target.getBoundingClientRect();
+      setHoveredIndex(index);
+      setTooltip({
+        index,
+        income: point.income,
+        expense: point.expense,
+        dateLabel: point.dateLabel,
+        x: rect.left + rect.width / 2 + window.scrollX,
+        y: rect.top + window.scrollY
+      });
+    },
+    []
+  );
+
+  const hideTooltip = useCallback(() => {
+    setHoveredIndex(null);
+    setTooltip(null);
+  }, []);
 
   return (
     <div className="min-w-0 w-full rounded-2xl border bg-card p-6 shadow-sm">
@@ -157,32 +191,83 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
             width: chartWidth
           }}
         >
-          {points.map((point) => (
-            <div key={point.dateLabel} className="flex flex-col items-center gap-3">
-              <div className="flex h-40 w-full items-end gap-3 rounded-xl border border-border/40 bg-muted/20 px-3 py-4">
-                <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-emerald-500/20">
-                  <div
-                    className="w-full rounded-lg bg-emerald-500 transition-all duration-300"
-                    style={{ height: `${(point.income / maxValue) * 100}%` }}
-                    aria-label={`Income ${formatCurrency(point.income)}`}
-                  />
+          {points.map((point, index) => {
+            const isHovered = hoveredIndex === index;
+            return (
+              <button
+                key={point.dateLabel}
+                type="button"
+                className={cn(
+                  'relative flex flex-col items-center gap-3 rounded-lg outline-none transition',
+                  'focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2'
+                )}
+                onMouseEnter={(event) => showTooltip(index, point, event.currentTarget)}
+                onMouseMove={(event) => showTooltip(index, point, event.currentTarget)}
+                onMouseLeave={hideTooltip}
+                onFocus={(event) => showTooltip(index, point, event.currentTarget)}
+                onBlur={hideTooltip}
+              >
+                <div
+                  className={cn(
+                    'flex h-40 w-full items-end gap-3 rounded-xl border border-border/40 px-3 py-4 transition',
+                    isHovered ? 'bg-muted/40' : 'bg-muted/20'
+                  )}
+                >
+                  <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-emerald-500/20">
+                    <div
+                      className="w-full rounded-lg bg-emerald-500 transition-all duration-300"
+                      style={{ height: `${(point.income / maxValue) * 100}%` }}
+                      aria-label={`Income ${formatCurrency(point.income)}`}
+                    />
+                  </div>
+                  <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-rose-500/20">
+                    <div
+                      className="w-full rounded-lg bg-rose-500 transition-all duration-300"
+                      style={{ height: `${(point.expense / maxValue) * 100}%` }}
+                      aria-label={`Expense ${formatCurrency(point.expense)}`}
+                    />
+                  </div>
                 </div>
-                <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-rose-500/20">
-                  <div
-                    className="w-full rounded-lg bg-rose-500 transition-all duration-300"
-                    style={{ height: `${(point.expense / maxValue) * 100}%` }}
-                    aria-label={`Expense ${formatCurrency(point.expense)}`}
-                  />
+                <div className="text-center">
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">{point.label}</p>
+                  <p className="text-[11px] text-muted-foreground/80">{point.dateLabel}</p>
                 </div>
-              </div>
-              <div className="text-center">
-                <p className="text-xs font-semibold uppercase text-muted-foreground">{point.label}</p>
-                <p className="text-[11px] text-muted-foreground/80">{point.dateLabel}</p>
-              </div>
-            </div>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {tooltip && typeof document !== 'undefined'
+        ? createPortal(
+            <div
+              className="pointer-events-none fixed z-[9999] w-56 -translate-x-1/2 -translate-y-full rounded-lg border border-border/60 bg-card p-3 text-xs shadow-lg dark:bg-slate-900"
+              style={{
+                left: tooltip.x,
+                top: tooltip.y - 12
+              }}
+            >
+              <p className="text-[11px] font-semibold uppercase text-muted-foreground">{tooltip.dateLabel}</p>
+              <div className="mt-2 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-emerald-500">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    Income
+                  </span>
+                  <span className="font-medium text-foreground">{formatCurrency(tooltip.income)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-rose-500">
+                    <span className="h-2 w-2 rounded-full bg-rose-500" />
+                    Expense
+                  </span>
+                  <span className="font-medium text-foreground">{formatCurrency(tooltip.expense)}</span>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
 
       <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
