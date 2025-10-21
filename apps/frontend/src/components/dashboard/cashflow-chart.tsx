@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { DashboardTransaction } from '@zoltraak/types';
 import { cn } from '@/lib/utils';
@@ -38,6 +38,19 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
   const [rangeDays, setRangeDays] = useState<(typeof RANGE_OPTIONS)[number]['value']>(7);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const dragStateRef = useRef<{
+    isDragging: boolean;
+    startX: number;
+    scrollLeft: number;
+    pointerId: number | null;
+  }>({
+    isDragging: false,
+    startX: 0,
+    scrollLeft: 0,
+    pointerId: null
+  });
 
   const formatCurrency = (value: number) =>
     value.toLocaleString('en-US', {
@@ -106,6 +119,9 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
 
   const showTooltip = useCallback(
     (index: number, point: ChartPoint, target: HTMLElement) => {
+      if (dragStateRef.current.isDragging) {
+        return;
+      }
       const rect = target.getBoundingClientRect();
       setHoveredIndex(index);
       setTooltip({
@@ -124,6 +140,67 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
     setHoveredIndex(null);
     setTooltip(null);
   }, []);
+
+  const handlePointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === 'mouse' && event.buttons !== 1) {
+        return;
+      }
+      const container = scrollContainerRef.current;
+      if (!container) {
+        return;
+      }
+      if (container.scrollWidth <= container.clientWidth) {
+        return;
+      }
+      dragStateRef.current = {
+        isDragging: true,
+        startX: event.clientX,
+        scrollLeft: container.scrollLeft,
+        pointerId: event.pointerId
+      };
+      container.setPointerCapture(event.pointerId);
+      setIsDragging(true);
+      hideTooltip();
+    },
+    [hideTooltip]
+  );
+
+  const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    const container = scrollContainerRef.current;
+    if (!container || !dragStateRef.current.isDragging) {
+      return;
+    }
+    event.preventDefault();
+    const deltaX = event.clientX - dragStateRef.current.startX;
+    container.scrollLeft = dragStateRef.current.scrollLeft - deltaX;
+  }, []);
+
+  const endDrag = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const container = scrollContainerRef.current;
+      if (!container || !dragStateRef.current.isDragging) {
+        return;
+      }
+
+      if (dragStateRef.current.pointerId !== null) {
+        try {
+          container.releasePointerCapture(dragStateRef.current.pointerId);
+        } catch {
+          // ignore if pointer already released
+        }
+      }
+
+      dragStateRef.current = {
+        isDragging: false,
+        startX: 0,
+        scrollLeft: 0,
+        pointerId: null
+      };
+      setIsDragging(false);
+    },
+    []
+  );
 
   return (
     <div className="min-w-0 w-full rounded-2xl border bg-card p-6 shadow-sm">
@@ -179,7 +256,18 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
         </div>
       </div>
 
-      <div className="mt-6 w-full overflow-x-auto">
+      <div
+        ref={scrollContainerRef}
+        className={cn(
+          'mt-6 w-full overflow-x-auto',
+          rangeDays > 14 ? (isDragging ? 'cursor-grabbing select-none' : 'cursor-grab') : undefined
+        )}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        onPointerCancel={endDrag}
+      >
         <div
           className="grid gap-3 sm:gap-4"
           style={{
