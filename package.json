@@ -6,6 +6,7 @@
   "engines": {
     "node": ">=20.11.0"
   },
+  "packageManager": "pnpm@10.18.3",
   "workspaces": [
     "apps/backend",
     "apps/frontend",
@@ -13,11 +14,11 @@
     "packages/utils"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace apps/backend\" \"npm run dev --workspace apps/frontend\"",
-    "build": "npm run build --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "format": "npm run format --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "dev": "concurrently \"pnpm --filter @zoltraak/backend dev\" \"pnpm --filter @zoltraak/frontend dev\"",
+    "build": "pnpm -r --if-present build",
+    "lint": "pnpm -r --if-present lint",
+    "format": "pnpm -r --if-present format",
+    "test": "pnpm -r --if-present test"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

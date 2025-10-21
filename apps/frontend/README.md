@@ -1,10 +1,10 @@
 ## Zoltraak Frontend (Next.js 15)
 
 ### Commands
-- `npm run dev --workspace apps/frontend` – start Next.js with the App Router
-- `npm run build --workspace apps/frontend` – production build
-- `npm run lint --workspace apps/frontend` – run ESLint (`next lint`)
-- `npm run typecheck --workspace apps/frontend` – TypeScript check with project refs
+- `pnpm --filter @zoltraak/frontend dev` - start Next.js with the App Router
+- `pnpm --filter @zoltraak/frontend build` - production build
+- `pnpm --filter @zoltraak/frontend lint` - run ESLint (`next lint`)
+- `pnpm --filter @zoltraak/frontend typecheck` - TypeScript project check
 
 ### Features
 - App Router with route groups for authenticated vs public flows
