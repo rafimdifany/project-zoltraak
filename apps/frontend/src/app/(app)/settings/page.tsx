@@ -1,18 +1,16 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LogoutButton } from '@/components/auth/logout-button';
 import { useAuth } from '@/contexts/auth-context';
 
 const formatDate = (value?: string | null) =>
   value ? new Date(value).toLocaleString() : 'Not available';
 
 export default function SettingsPage() {
-  const router = useRouter();
-  const { user, logout, isInitializing } = useAuth();
+  const { user, isInitializing } = useAuth();
 
   if (isInitializing) {
     return (
@@ -25,11 +23,6 @@ export default function SettingsPage() {
   if (!user) {
     return null;
   }
-
-  const handleLogout = () => {
-    logout();
-    router.replace('/login');
-  };
 
   return (
     <section className="space-y-6">
@@ -80,9 +73,7 @@ export default function SettingsPage() {
           <p className="text-sm text-muted-foreground">
             Logging out clears local session tokens stored in your browser.
           </p>
-          <Button variant="outline" onClick={handleLogout}>
-            Log out
-          </Button>
+          <LogoutButton>Log out</LogoutButton>
         </CardContent>
       </Card>
     </section>

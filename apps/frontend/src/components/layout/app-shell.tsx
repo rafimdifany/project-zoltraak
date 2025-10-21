@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { LogoutButton } from '@/components/auth/logout-button';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -24,18 +24,13 @@ const navItems = [
 export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, isInitializing, logout } = useAuth();
+  const { user, isAuthenticated, isInitializing } = useAuth();
 
   useEffect(() => {
     if (!isInitializing && !isAuthenticated) {
       router.replace('/login');
     }
   }, [isAuthenticated, isInitializing, router]);
-
-  const handleLogout = () => {
-    logout();
-    router.replace('/login');
-  };
 
   const activePath = useMemo(() => {
     if (!pathname) {
@@ -102,9 +97,7 @@ export function AppShell({ children }: AppShellProps) {
             >
               Settings
             </Link>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
+            <LogoutButton>Logout</LogoutButton>
           </div>
         </div>
       </header>
