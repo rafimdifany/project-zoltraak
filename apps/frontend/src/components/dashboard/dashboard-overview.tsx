@@ -5,8 +5,10 @@ import { Loader2 } from 'lucide-react';
 import { useDashboardOverview } from '@/hooks/use-dashboard';
 import { AssetsSummary } from './assets-summary';
 import { BudgetsSummary } from './budgets-summary';
+import { CashflowChart } from './cashflow-chart';
 import { OverviewCards } from './overview-cards';
 import { RecentTransactions } from './recent-transactions';
+import { SpendingCategories } from './spending-categories';
 
 export function DashboardOverview() {
   const { data, isLoading, isError } = useDashboardOverview();
@@ -30,6 +32,10 @@ export function DashboardOverview() {
   return (
     <div className="space-y-6">
       <OverviewCards totals={data.totals} />
+      <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+        <CashflowChart transactions={data.recentTransactions} />
+        <SpendingCategories transactions={data.recentTransactions} />
+      </div>
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <RecentTransactions transactions={data.recentTransactions} />
         <AssetsSummary assets={data.assets} />
