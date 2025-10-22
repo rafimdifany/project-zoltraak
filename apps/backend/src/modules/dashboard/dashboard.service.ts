@@ -24,7 +24,15 @@ export class DashboardService {
       ...(dateFilter ?? {})
     };
 
-    const [incomeAgg, expenseAgg, recentTransactions, budgets, assets, assetsAgg] = await Promise.all([
+    const [
+      incomeAgg,
+      expenseAgg,
+      recentTransactions,
+      budgets,
+      assets,
+      assetsAgg,
+      user
+    ] = await Promise.all([
       this.prisma.transaction.aggregate({
         where: {
           ...where,
@@ -56,6 +64,10 @@ export class DashboardService {
       this.prisma.asset.aggregate({
         where: { userId },
         _sum: { currentValue: true }
+      }),
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { currency: true }
       })
     ]);
 
@@ -66,6 +78,7 @@ export class DashboardService {
         category: item.category,
         amount: item.amount.toNumber(),
         occurredAt: item.occurredAt.toISOString(),
+        currency: item.currency ?? null,
         description: item.description
       }));
 
@@ -103,7 +116,8 @@ export class DashboardService {
         income,
         expense,
         net: income - expense,
-        assets: assetsTotal
+        assets: assetsTotal,
+        currency: user?.currency ?? null
       },
       recentTransactions: formatTransactions(recentTransactions),
       budgets: budgetsWithProgress,

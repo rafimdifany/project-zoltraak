@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useBudgets, useCreateBudget, useDeleteBudget, useUpdateBudget } from '@/hooks/use-budgets';
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import { useTransactions } from '@/hooks/use-transactions';
 import { getErrorMessage } from '@/lib/http-error';
 import type { Budget, Transaction } from '@zoltraak/types';
@@ -42,13 +43,8 @@ const createDefaultValues = (): BudgetFormValues => {
   };
 };
 
-const formatCurrency = (value: number) =>
-  value.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  });
-
 export default function BudgetsPage() {
+  const { format: formatCurrency } = useCurrencyFormatter();
   const budgetsQuery = useBudgets();
   const transactionsQuery = useTransactions();
 

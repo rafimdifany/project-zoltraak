@@ -1,5 +1,6 @@
 import type { Asset } from './asset';
 import type { BudgetWithProgress } from './budget';
+import type { CurrencyCode } from './user';
 import type { TransactionType } from './transaction';
 
 export interface DashboardTotals {
@@ -7,6 +8,7 @@ export interface DashboardTotals {
   expense: number;
   net: number;
   assets: number;
+  currency: CurrencyCode | null;
 }
 
 export interface DashboardTransaction {
@@ -15,6 +17,7 @@ export interface DashboardTransaction {
   category: string;
   amount: number;
   occurredAt: string;
+  currency: CurrencyCode | null;
   description?: string | null;
 }
 

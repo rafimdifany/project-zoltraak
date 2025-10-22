@@ -9,6 +9,7 @@ const serializeTransaction = (transaction: TransactionModel): TransactionDto => 
   id: transaction.id,
   userId: transaction.userId,
   type: transaction.type,
+  currency: transaction.currency ?? null,
   category: transaction.category,
   amount: transaction.amount.toNumber(),
   occurredAt: transaction.occurredAt.toISOString(),
@@ -30,10 +31,20 @@ export class TransactionService {
   }
 
   async create(userId: string, input: CreateTransactionInput): Promise<TransactionDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { currency: true }
+    });
+
+    if (!user?.currency) {
+      throw new AppError('Currency must be set before recording transactions.', 409);
+    }
+
     const record = await this.prisma.transaction.create({
       data: {
         userId,
         type: input.type,
+        currency: user.currency,
         category: input.category,
         amount: new Prisma.Decimal(input.amount),
         occurredAt: input.occurredAt,

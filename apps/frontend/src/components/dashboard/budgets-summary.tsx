@@ -1,5 +1,6 @@
 'use client';
 
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import type { BudgetWithProgress } from '@zoltraak/types';
 
 type BudgetsSummaryProps = {
@@ -7,6 +8,8 @@ type BudgetsSummaryProps = {
 };
 
 export function BudgetsSummary({ budgets }: BudgetsSummaryProps) {
+  const { format } = useCurrencyFormatter();
+
   if (!budgets.length) {
     return (
       <div className="rounded-2xl border bg-card p-6 text-center text-sm text-muted-foreground">
@@ -37,11 +40,7 @@ export function BudgetsSummary({ budgets }: BudgetsSummaryProps) {
                   </p>
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  {budget.spent.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD'
-                  })}
-                  /{budget.targetAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                  {format(budget.spent)}/{format(budget.targetAmount)}
                 </span>
               </div>
               <div className="h-2 rounded-full bg-muted">

@@ -2,6 +2,7 @@
 
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import type { DashboardTransaction } from '@zoltraak/types';
 
 type RecentTransactionsProps = {
@@ -9,6 +10,8 @@ type RecentTransactionsProps = {
 };
 
 export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  const { format } = useCurrencyFormatter();
+
   if (!transactions.length) {
     return (
       <div className="rounded-2xl border bg-card p-6 text-center text-sm text-muted-foreground">
@@ -51,10 +54,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                   isIncome ? 'text-emerald-500' : 'text-rose-500'
                 }`}
               >
-                {`${isIncome ? '+' : '-'}${transaction.amount.toLocaleString('en-US', {
-                  style: 'currency',
-                  currency: 'USD'
-                })}`}
+                {`${isIncome ? '+' : '-'}${format(transaction.amount)}`}
               </span>
             </li>
           );

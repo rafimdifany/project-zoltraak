@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { DashboardTransaction } from '@zoltraak/types';
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import { cn } from '@/lib/utils';
 
 type CashflowChartProps = {
@@ -52,11 +53,7 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
     pointerId: null
   });
 
-  const formatCurrency = (value: number) =>
-    value.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    });
+  const { format: formatCurrency } = useCurrencyFormatter();
 
   const points = useMemo<ChartPoint[]>(() => {
     const today = new Date();

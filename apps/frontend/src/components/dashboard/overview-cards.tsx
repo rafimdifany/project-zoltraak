@@ -1,5 +1,6 @@
 import { Banknote, PiggyBank, TrendingUp, Wallet } from 'lucide-react';
 
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import type { DashboardTotals } from '@zoltraak/types';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +40,8 @@ const overviewConfig = [
 ];
 
 export function OverviewCards({ totals }: OverviewCardsProps) {
+  const { format } = useCurrencyFormatter();
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {overviewConfig.map(({ key, label, icon: Icon, accent, bg }) => (
@@ -49,12 +52,7 @@ export function OverviewCards({ totals }: OverviewCardsProps) {
               <Icon className={cn('h-4 w-4', accent)} />
             </div>
           </div>
-          <p className="mt-3 text-2xl font-semibold">
-            {totals[key].toLocaleString('en-US', {
-              style: 'currency',
-              currency: 'USD'
-            })}
-          </p>
+          <p className="mt-3 text-2xl font-semibold">{format(totals[key])}</p>
         </div>
       ))}
     </div>

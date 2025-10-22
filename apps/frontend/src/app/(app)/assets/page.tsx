@@ -18,6 +18,7 @@ import {
   useDeleteAsset,
   useUpdateAsset
 } from '@/hooks/use-assets';
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import { getErrorMessage } from '@/lib/http-error';
 import type { Asset } from '@zoltraak/types';
 
@@ -45,13 +46,8 @@ const groupFormSchema = z.object({
 
 type GroupFormValues = z.infer<typeof groupFormSchema>;
 
-const formatCurrency = (value: number) =>
-  value.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  });
-
 export default function AssetsPage() {
+  const { format: formatCurrency } = useCurrencyFormatter();
   const assetsQuery = useAssets();
   const assetGroupsQuery = useAssetGroups();
   const createAsset = useCreateAsset();

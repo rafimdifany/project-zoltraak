@@ -1,16 +1,36 @@
 'use client';
 
+import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CurrencyModal } from '@/components/currency/currency-modal';
+import { findCurrencyOption } from '@/components/currency/currency-options';
 import { LogoutButton } from '@/components/auth/logout-button';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
+import { useUpdateCurrency } from '@/hooks/use-user';
+import { getErrorMessage } from '@/lib/http-error';
+import type { CurrencyCode } from '@zoltraak/types';
 
 const formatDate = (value?: string | null) =>
   value ? new Date(value).toLocaleString() : 'Not available';
 
 export default function SettingsPage() {
   const { user, isInitializing } = useAuth();
+  const updateCurrency = useUpdateCurrency();
+  const [isCurrencyModalOpen, setCurrencyModalOpen] = useState(false);
+  const [currencyError, setCurrencyError] = useState<string | null>(null);
+
+  const openCurrencyModal = () => {
+    setCurrencyError(null);
+    setCurrencyModalOpen(true);
+  };
+
+  const closeCurrencyModal = () => {
+    setCurrencyModalOpen(false);
+    setCurrencyError(null);
+  };
 
   if (isInitializing) {
     return (
@@ -23,6 +43,30 @@ export default function SettingsPage() {
   if (!user) {
     return null;
   }
+
+  const currentCurrencyOption = findCurrencyOption(user.currency);
+
+  const handleCurrencySubmit = async (currency: CurrencyCode) => {
+    if (user.currency && user.currency !== currency) {
+      const confirmed = window.confirm(
+        'Changing your currency will permanently delete all existing transactions. Continue?'
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    setCurrencyError(null);
+
+    try {
+      await updateCurrency.mutateAsync({ currency });
+      setCurrencyModalOpen(false);
+    } catch (error) {
+      setCurrencyError(
+        getErrorMessage(error, 'Unable to update your currency. Please try again.')
+      );
+    }
+  };
 
   return (
     <section className="space-y-6">
@@ -53,6 +97,14 @@ export default function SettingsPage() {
               <dd className="text-sm font-medium text-foreground">{user.role.toLowerCase()}</dd>
             </div>
             <div>
+              <dt className="text-xs uppercase text-muted-foreground">Currency</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {currentCurrencyOption
+                  ? `${currentCurrencyOption.icon} ${currentCurrencyOption.label} (${currentCurrencyOption.symbol})`
+                  : 'Not set'}
+              </dd>
+            </div>
+            <div>
               <dt className="text-xs uppercase text-muted-foreground">Member since</dt>
               <dd className="text-sm font-medium text-foreground">{formatDate(user.createdAt)}</dd>
             </div>
@@ -61,6 +113,34 @@ export default function SettingsPage() {
               <dd className="text-sm font-medium text-foreground">{formatDate(user.updatedAt)}</dd>
             </div>
           </dl>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Currency preference</CardTitle>
+          <CardDescription>
+            We format every balance, budget, and transaction using the currency you choose.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              {currentCurrencyOption
+                ? `${currentCurrencyOption.icon} ${currentCurrencyOption.label} (${currentCurrencyOption.code})`
+                : 'No currency selected'}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Changing your currency deletes all existing transaction history.
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={openCurrencyModal}
+            disabled={updateCurrency.isPending}
+          >
+            {user.currency ? 'Change currency' : 'Set currency'}
+          </Button>
         </CardContent>
       </Card>
 
@@ -76,6 +156,18 @@ export default function SettingsPage() {
           <LogoutButton>Log out</LogoutButton>
         </CardContent>
       </Card>
+
+      <CurrencyModal
+        isOpen={isCurrencyModalOpen}
+        initialCurrency={user.currency ?? null}
+        onSubmit={handleCurrencySubmit}
+        onClose={closeCurrencyModal}
+        isSubmitting={updateCurrency.isPending}
+        allowDismiss
+        warning="Changing your currency will permanently delete all existing transactions."
+        error={currencyError}
+        description="Select the currency that best matches your accounts. This choice applies to all future data."
+      />
     </section>
   );
 }

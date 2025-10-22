@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import type { DashboardTransaction } from '@zoltraak/types';
 
 type SpendingCategoriesProps = {
@@ -8,6 +9,8 @@ type SpendingCategoriesProps = {
 };
 
 export function SpendingCategories({ transactions }: SpendingCategoriesProps) {
+  const { format } = useCurrencyFormatter();
+
   const { rankedCategories, totalExpense } = useMemo(() => {
     const expenses = transactions.filter((transaction) => transaction.type === 'EXPENSE');
 
@@ -64,10 +67,7 @@ export function SpendingCategories({ transactions }: SpendingCategoriesProps) {
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                {entry.value.toLocaleString('en-US', {
-                  style: 'currency',
-                  currency: 'USD'
-                })}
+                {format(entry.value)}
               </p>
             </div>
           );

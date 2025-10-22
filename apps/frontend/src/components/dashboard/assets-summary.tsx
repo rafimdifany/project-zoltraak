@@ -1,5 +1,6 @@
 'use client';
 
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import type { Asset } from '@zoltraak/types';
 
 type AssetsSummaryProps = {
@@ -7,6 +8,8 @@ type AssetsSummaryProps = {
 };
 
 export function AssetsSummary({ assets }: AssetsSummaryProps) {
+  const { format } = useCurrencyFormatter();
+
   if (!assets.length) {
     return (
       <div className="rounded-2xl border bg-card p-6 text-center text-sm text-muted-foreground">
@@ -30,10 +33,7 @@ export function AssetsSummary({ assets }: AssetsSummaryProps) {
               <p className="text-xs text-muted-foreground capitalize">{asset.group.name}</p>
             </div>
             <span className="font-semibold">
-              {asset.currentValue.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD'
-              })}
+              {format(asset.currentValue)}
             </span>
           </li>
         ))}

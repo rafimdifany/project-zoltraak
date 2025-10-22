@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useBudgets } from '@/hooks/use-budgets';
+import { useCurrencyFormatter } from '@/hooks/use-currency';
 import {
   useCreateTransaction,
   useDeleteTransaction,
@@ -54,6 +55,7 @@ export default function TransactionsPage() {
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
   const deleteTransaction = useDeleteTransaction();
+  const { format: formatCurrency } = useCurrencyFormatter();
 
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -302,12 +304,7 @@ export default function TransactionsPage() {
                               {isIncome ? 'Income' : 'Expense'}
                             </span>
                           </td>
-                          <td className="py-3 pr-4 font-semibold">
-                            {transaction.amount.toLocaleString('en-US', {
-                              style: 'currency',
-                              currency: 'USD'
-                            })}
-                          </td>
+                          <td className="py-3 pr-4 font-semibold">{formatCurrency(transaction.amount)}</td>
                           <td className="py-3 pr-4 text-muted-foreground">
                             {new Date(transaction.occurredAt).toLocaleDateString()}
                           </td>

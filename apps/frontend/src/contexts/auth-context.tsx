@@ -32,6 +32,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isInitializing: boolean;
   setAuth: (auth: StoredAuth) => void;
+  updateUser: (user: User) => void;
   logout: () => void;
 };
 
@@ -92,6 +93,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
   }, []);
 
+  const updateUser = useCallback((user: User) => {
+    setState((prev) => {
+      if (!prev.tokens) {
+        return prev;
+      }
+      saveAuth({
+        user,
+        tokens: prev.tokens
+      });
+      return {
+        ...prev,
+        user
+      };
+    });
+  }, []);
+
   const logout = useCallback(() => {
     clearAuth();
     setState({
@@ -108,9 +125,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isAuthenticated: Boolean(state.user && state.tokens?.accessToken),
       isInitializing: state.isInitializing,
       setAuth,
+      updateUser,
       logout
     }),
-    [setAuth, logout, state.user, state.tokens, state.isInitializing]
+    [setAuth, updateUser, logout, state.user, state.tokens, state.isInitializing]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
