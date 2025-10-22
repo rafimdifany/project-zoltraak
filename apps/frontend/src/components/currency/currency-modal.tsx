@@ -39,8 +39,10 @@ export function CurrencyModal({
   useEffect(() => {
     if (isOpen) {
       setSelected(initialCurrency ?? null);
-      setIsConfirming(false);
+    } else {
+      setSelected(null);
     }
+    setIsConfirming(false);
   }, [initialCurrency, isOpen]);
 
   const selectedOption = useMemo(
@@ -138,8 +140,13 @@ export function CurrencyModal({
           })}
         </div>
 
-        {isConfirming ? (
-          <div className="mt-6 rounded-xl border border-rose-200 bg-rose-50/90 p-4 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-100">
+        <div
+          className={cn(
+            'mt-6 overflow-hidden rounded-xl border border-rose-200 bg-rose-50/90 transition-all duration-300 ease-out dark:border-rose-500/40 dark:bg-rose-500/10',
+            isConfirming ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+          )}
+        >
+          <div className="p-4 text-sm text-rose-700 dark:text-rose-100">
             <div className="flex items-start gap-3">
               <div className="mt-1">
                 <AlertTriangle className="h-5 w-5" />
@@ -153,7 +160,7 @@ export function CurrencyModal({
               </div>
             </div>
           </div>
-        ) : null}
+        </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-xs text-muted-foreground">
