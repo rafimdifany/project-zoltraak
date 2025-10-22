@@ -2,6 +2,7 @@ import { Prisma, type AssetGroup as AssetGroupModel, type PrismaClient } from '@
 
 import type { AssetGroup } from '@zoltraak/types';
 import { AppError } from '../../lib/app-error';
+import { ensureUserCurrency } from '../../lib/ensure-user-currency';
 import { DEFAULT_ASSET_GROUP_SET, DEFAULT_ASSET_GROUPS } from './constants';
 
 export class AssetGroupService {
@@ -45,6 +46,7 @@ export class AssetGroupService {
   }
 
   async create(userId: string, name: string): Promise<AssetGroup> {
+    await ensureUserCurrency(this.prisma, userId);
     await this.ensureDefaults(userId);
 
     const trimmed = name.trim();

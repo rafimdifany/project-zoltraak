@@ -1,16 +1,20 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LayoutDashboard, Loader2, PiggyBank, Receipt, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
 
+import { CurrencyModal } from '@/components/currency/currency-modal';
 import { LogoutButton } from '@/components/auth/logout-button';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { buttonVariants } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
+import { useUpdateCurrency } from '@/hooks/use-user';
+import { getErrorMessage } from '@/lib/http-error';
 import { cn } from '@/lib/utils';
+import type { CurrencyCode } from '@zoltraak/types';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -23,12 +27,55 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, isInitializing } = useAuth();
+  const updateCurrency = useUpdateCurrency();
+  const [isCurrencyModalOpen, setCurrencyModalOpen] = useState(false);
+  const [currencyError, setCurrencyError] = useState<string | null>(null);
+
+  const requiresCurrency = isAuthenticated && Boolean(user) && !user?.currency;
 
   useEffect(() => {
     if (!isInitializing && !isAuthenticated) {
       router.replace('/login');
     }
   }, [isAuthenticated, isInitializing, router]);
+
+  useEffect(() => {
+    if (requiresCurrency) {
+      setCurrencyModalOpen(true);
+      setCurrencyError(null);
+    } else if (!requiresCurrency && !updateCurrency.isPending) {
+      setCurrencyModalOpen(false);
+    }
+  }, [requiresCurrency, updateCurrency.isPending]);
+
+  const handleCurrencySubmit = async (currency: CurrencyCode) => {
+    if (user?.currency && user.currency !== currency) {
+      const confirmed = window.confirm(
+        'Changing your currency will permanently delete all existing transactions. Continue?'
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    setCurrencyError(null);
+
+    try {
+      await updateCurrency.mutateAsync({ currency });
+      setCurrencyModalOpen(false);
+    } catch (error) {
+      setCurrencyError(
+        getErrorMessage(error, 'Unable to update currency. Please try again.')
+      );
+    }
+  };
+
+  const handleCurrencyClose = () => {
+    if (!requiresCurrency) {
+      setCurrencyModalOpen(false);
+      setCurrencyError(null);
+    }
+  };
 
   const activePath = useMemo(() => {
     if (!pathname) {
@@ -114,6 +161,21 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <main className="flex-1 overflow-y-auto">
         <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">{children}</div>
       </main>
+
+      <CurrencyModal
+        isOpen={isCurrencyModalOpen}
+        initialCurrency={user?.currency ?? null}
+        onSubmit={handleCurrencySubmit}
+        onClose={handleCurrencyClose}
+        isSubmitting={updateCurrency.isPending}
+        allowDismiss={!requiresCurrency}
+        warning={
+          requiresCurrency
+            ? 'Please choose your preferred currency to continue.'
+            : 'Changing your currency will permanently delete all existing transactions.'
+        }
+        error={currencyError}
+      />
     </div>
   );
 }

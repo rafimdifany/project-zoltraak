@@ -2,6 +2,7 @@ import { Prisma, type Budget as BudgetModel, type PrismaClient } from '@prisma/c
 
 import type { Budget as BudgetDto } from '@zoltraak/types';
 import { AppError } from '../../lib/app-error';
+import { ensureUserCurrency } from '../../lib/ensure-user-currency';
 import type { CreateBudgetInput, UpdateBudgetInput } from './budget.schema';
 
 export class BudgetService {
@@ -30,6 +31,8 @@ export class BudgetService {
   }
 
   async create(userId: string, input: CreateBudgetInput): Promise<BudgetDto> {
+    await ensureUserCurrency(this.prisma, userId);
+
     const budget = await this.prisma.budget.create({
       data: {
         userId,

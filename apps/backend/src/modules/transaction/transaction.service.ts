@@ -3,6 +3,7 @@ import { Prisma, type PrismaClient, type Transaction as TransactionModel } from 
 import type { Transaction as TransactionDto } from '@zoltraak/types';
 
 import { AppError } from '../../lib/app-error';
+import { ensureUserCurrency } from '../../lib/ensure-user-currency';
 import type { CreateTransactionInput, UpdateTransactionInput } from './transaction.schema';
 
 const serializeTransaction = (transaction: TransactionModel): TransactionDto => ({
@@ -31,20 +32,13 @@ export class TransactionService {
   }
 
   async create(userId: string, input: CreateTransactionInput): Promise<TransactionDto> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { currency: true }
-    });
-
-    if (!user?.currency) {
-      throw new AppError('Currency must be set before recording transactions.', 409);
-    }
+    const currency = await ensureUserCurrency(this.prisma, userId);
 
     const record = await this.prisma.transaction.create({
       data: {
         userId,
         type: input.type,
-        currency: user.currency,
+        currency,
         category: input.category,
         amount: new Prisma.Decimal(input.amount),
         occurredAt: input.occurredAt,

@@ -7,6 +7,7 @@ import {
 
 import type { Asset as AssetDto } from '@zoltraak/types';
 import { AppError } from '../../lib/app-error';
+import { ensureUserCurrency } from '../../lib/ensure-user-currency';
 import { AssetGroupService } from './asset-group.service';
 import type { CreateAssetInput, UpdateAssetInput } from './asset.schema';
 
@@ -49,6 +50,7 @@ export class AssetService {
   }
 
   async create(userId: string, input: CreateAssetInput): Promise<AssetDto> {
+    await ensureUserCurrency(this.prisma, userId);
     await this.assetGroupService.findOwnedBy(userId, input.groupId);
 
     const asset = await this.prisma.asset.create({
