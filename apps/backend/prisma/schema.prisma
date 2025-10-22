@@ -92,7 +92,7 @@ enum TransactionType {
 
 enum CurrencyCode {
   USD
-  SDG
+  SGD
   INR
   JPY
   RUB

@@ -1,7 +1,7 @@
 -- CreateEnum
 CREATE TYPE "CurrencyCode" AS ENUM (
   'USD',
-  'SDG',
+  'SGD',
   'INR',
   'JPY',
   'RUB',

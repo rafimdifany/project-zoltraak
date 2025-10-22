@@ -7,7 +7,7 @@ const DEFAULT_CURRENCY: CurrencyCode = 'USD';
 
 const currencySymbols: Record<CurrencyCode, string> = {
   USD: '$',
-  SDG: 'SDG',
+  SGD: 'S$',
   INR: '₹',
   JPY: '¥',
   RUB: '₽',

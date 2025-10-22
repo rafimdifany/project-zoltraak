@@ -9,7 +9,7 @@ export type CurrencyOption = {
 
 export const currencyOptions: CurrencyOption[] = [
   { code: 'USD', label: 'US Dollar', symbol: '$', icon: '🇺🇸' },
-  { code: 'SDG', label: 'Sudanese Pound', symbol: 'SDG', icon: '🇸🇩' },
+  { code: 'SGD', label: 'Singapore Dollar', symbol: 'S$', icon: '🇸🇬' },
   { code: 'INR', label: 'Indian Rupee', symbol: '₹', icon: '🇮🇳' },
   { code: 'JPY', label: 'Japanese Yen', symbol: '¥', icon: '🇯🇵' },
   { code: 'RUB', label: 'Russian Ruble', symbol: '₽', icon: '🇷🇺' },

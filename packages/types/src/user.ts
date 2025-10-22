@@ -2,7 +2,7 @@ export type UserRole = 'USER' | 'PREMIUM' | 'ADMIN';
 
 export type CurrencyCode =
   | 'USD'
-  | 'SDG'
+  | 'SGD'
   | 'INR'
   | 'JPY'
   | 'RUB'
