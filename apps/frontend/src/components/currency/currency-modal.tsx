@@ -1,9 +1,10 @@
 'use client';
 
-import { Loader2, X } from 'lucide-react';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { CurrencyCode } from '@zoltraak/types';
 import { currencyOptions, type CurrencyOption } from './currency-options';
 
@@ -33,10 +34,12 @@ export function CurrencyModal({
   error
 }: CurrencyModalProps) {
   const [selected, setSelected] = useState<CurrencyCode | null>(null);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSelected(initialCurrency ?? null);
+      setIsConfirming(false);
     }
   }, [initialCurrency, isOpen]);
 
@@ -55,10 +58,24 @@ export function CurrencyModal({
     }
   };
 
+  const requiresConfirmation =
+    Boolean(initialCurrency) && Boolean(selected) && selected !== initialCurrency;
+
   const handleConfirm = () => {
-    if (selected && !isSubmitting) {
-      onSubmit(selected);
+    if (!selected || isSubmitting) {
+      return;
     }
+
+    if (requiresConfirmation && !isConfirming) {
+      setIsConfirming(true);
+      return;
+    }
+
+    onSubmit(selected);
+  };
+
+  const handleConfirmBack = () => {
+    setIsConfirming(false);
   };
 
   return (
@@ -101,11 +118,12 @@ export function CurrencyModal({
                 key={option.code}
                 type="button"
                 onClick={() => setSelected(option.code)}
-                className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
+                className={cn(
+                  'flex items-center gap-3 rounded-xl border p-4 text-left transition',
                   isSelected
                     ? 'border-primary bg-primary/10 shadow-sm'
                     : 'border-border hover:border-primary/80 hover:bg-muted/60'
-                }`}
+                )}
                 disabled={isSubmitting}
               >
                 <span className="text-2xl leading-none">{option.icon}</span>
@@ -119,6 +137,23 @@ export function CurrencyModal({
             );
           })}
         </div>
+
+        {isConfirming ? (
+          <div className="mt-6 rounded-xl border border-rose-200 bg-rose-50/90 p-4 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-100">
+            <div className="flex items-start gap-3">
+              <div className="mt-1">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div className="space-y-2">
+                <p className="font-semibold">Heads up – this will reset your history</p>
+                <p>
+                  Changing your currency clears all existing transactions so future totals stay
+                  accurate. This action cannot be undone.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-xs text-muted-foreground">
@@ -137,6 +172,16 @@ export function CurrencyModal({
                 Cancel
               </Button>
             ) : null}
+            {isConfirming ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleConfirmBack}
+                disabled={isSubmitting}
+              >
+                Go back
+              </Button>
+            ) : null}
             <Button
               type="button"
               disabled={!selected || isSubmitting}
@@ -147,6 +192,10 @@ export function CurrencyModal({
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
+              ) : requiresConfirmation && !isConfirming ? (
+                'Continue'
+              ) : isConfirming ? (
+                'Confirm & reset history'
               ) : (
                 'Save currency'
               )}

@@ -47,15 +47,6 @@ export default function SettingsPage() {
   const currentCurrencyOption = findCurrencyOption(user.currency);
 
   const handleCurrencySubmit = async (currency: CurrencyCode) => {
-    if (user.currency && user.currency !== currency) {
-      const confirmed = window.confirm(
-        'Changing your currency will permanently delete all existing transactions. Continue?'
-      );
-      if (!confirmed) {
-        return;
-      }
-    }
-
     setCurrencyError(null);
 
     try {
