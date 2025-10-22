@@ -6,7 +6,7 @@ export const assetIdSchema = z.object({
 
 export const createAssetSchema = z.object({
   name: z.string().min(1),
-  category: z.string().max(100).optional(),
+  groupId: z.string().uuid(),
   currentValue: z.number().nonnegative()
 });
 

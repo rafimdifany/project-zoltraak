@@ -50,6 +50,7 @@ export class DashboardService {
       }),
       this.prisma.asset.findMany({
         where: { userId },
+        include: { group: true },
         orderBy: { currentValue: 'desc' }
       }),
       this.prisma.asset.aggregate({
@@ -110,7 +111,15 @@ export class DashboardService {
         id: asset.id,
         userId: asset.userId,
         name: asset.name,
-        category: asset.category,
+        groupId: asset.groupId,
+        group: {
+          id: asset.group.id,
+          userId: asset.group.userId,
+          name: asset.group.name,
+          isDefault: asset.group.isDefault,
+          createdAt: asset.group.createdAt.toISOString(),
+          updatedAt: asset.group.updatedAt.toISOString()
+        },
         currentValue: asset.currentValue.toNumber(),
         createdAt: asset.createdAt.toISOString(),
         updatedAt: asset.updatedAt.toISOString()

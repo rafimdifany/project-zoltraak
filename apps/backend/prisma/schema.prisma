@@ -19,6 +19,7 @@ model User {
   transactions Transaction[]
   budgets      Budget[]
   assets       Asset[]
+  assetGroups  AssetGroup[]
 }
 
 model Transaction {
@@ -51,14 +52,29 @@ model Budget {
 }
 
 model Asset {
-  id          String   @id @default(uuid())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String
-  name        String
-  category    String?
-  currentValue Decimal  @db.Decimal(18, 2)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String      @id @default(uuid())
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  group        AssetGroup  @relation(fields: [groupId], references: [id])
+  groupId      String
+  name         String
+  currentValue Decimal     @db.Decimal(18, 2)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model AssetGroup {
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  name      String
+  isDefault Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assets Asset[]
+
+  @@unique([userId, name])
 }
 
 enum UserRole {

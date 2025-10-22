@@ -1,18 +1,37 @@
-import { Prisma, type Asset as AssetModel, type PrismaClient } from '@prisma/client';
+import {
+  Prisma,
+  type Asset as AssetModel,
+  type AssetGroup as AssetGroupModel,
+  type PrismaClient
+} from '@prisma/client';
 
 import type { Asset as AssetDto } from '@zoltraak/types';
 import { AppError } from '../../lib/app-error';
+import { AssetGroupService } from './asset-group.service';
 import type { CreateAssetInput, UpdateAssetInput } from './asset.schema';
 
-export class AssetService {
-  constructor(private readonly prisma: PrismaClient) {}
+type AssetWithGroup = AssetModel & { group: AssetGroupModel };
 
-  private serialize(asset: AssetModel): AssetDto {
+export class AssetService {
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly assetGroupService: AssetGroupService
+  ) {}
+
+  private serialize(asset: AssetWithGroup): AssetDto {
     return {
       id: asset.id,
       userId: asset.userId,
       name: asset.name,
-      category: asset.category,
+      group: {
+        id: asset.group.id,
+        userId: asset.group.userId,
+        name: asset.group.name,
+        isDefault: asset.group.isDefault,
+        createdAt: asset.group.createdAt.toISOString(),
+        updatedAt: asset.group.updatedAt.toISOString()
+      },
+      groupId: asset.groupId,
       currentValue: asset.currentValue.toNumber(),
       createdAt: asset.createdAt.toISOString(),
       updatedAt: asset.updatedAt.toISOString()
@@ -22,6 +41,7 @@ export class AssetService {
   async list(userId: string): Promise<AssetDto[]> {
     const assets = await this.prisma.asset.findMany({
       where: { userId },
+      include: { group: true },
       orderBy: { createdAt: 'desc' }
     });
 
@@ -29,13 +49,16 @@ export class AssetService {
   }
 
   async create(userId: string, input: CreateAssetInput): Promise<AssetDto> {
+    await this.assetGroupService.findOwnedBy(userId, input.groupId);
+
     const asset = await this.prisma.asset.create({
       data: {
         userId,
         name: input.name,
-        category: input.category ?? null,
+        groupId: input.groupId,
         currentValue: new Prisma.Decimal(input.currentValue)
-      }
+      },
+      include: { group: true }
     });
 
     return this.serialize(asset);
@@ -50,15 +73,20 @@ export class AssetService {
       throw new AppError('Asset not found', 404);
     }
 
+    if (input.groupId) {
+      await this.assetGroupService.findOwnedBy(userId, input.groupId);
+    }
+
     const updated = await this.prisma.asset.update({
       where: { id },
       data: {
         ...(input.name && { name: input.name }),
-        ...(input.category !== undefined && { category: input.category ?? null }),
+        ...(input.groupId && { groupId: input.groupId }),
         ...(input.currentValue !== undefined && {
           currentValue: new Prisma.Decimal(input.currentValue)
         })
-      }
+      },
+      include: { group: true }
     });
 
     return this.serialize(updated);

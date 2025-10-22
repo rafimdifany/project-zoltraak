@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Edit3, Loader2, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -10,17 +10,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAssets, useCreateAsset, useDeleteAsset, useUpdateAsset } from '@/hooks/use-assets';
+import {
+  useAssetGroups,
+  useAssets,
+  useCreateAsset,
+  useCreateAssetGroup,
+  useDeleteAsset,
+  useUpdateAsset
+} from '@/hooks/use-assets';
 import { getErrorMessage } from '@/lib/http-error';
 import type { Asset } from '@zoltraak/types';
 
 const assetFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  category: z
-    .string()
-    .max(100, 'Category must be 100 characters or less')
-    .optional()
-    .or(z.literal('')),
+  groupId: z.string().uuid({ message: 'Please choose a group' }),
   currentValue: z.coerce.number().nonnegative('Value must be zero or higher')
 });
 
@@ -28,7 +31,7 @@ type AssetFormValues = z.infer<typeof assetFormSchema>;
 
 const createDefaultValues = (): AssetFormValues => ({
   name: '',
-  category: '',
+  groupId: '',
   currentValue: 0
 });
 
@@ -40,9 +43,11 @@ const formatCurrency = (value: number) =>
 
 export default function AssetsPage() {
   const assetsQuery = useAssets();
+  const assetGroupsQuery = useAssetGroups();
   const createAsset = useCreateAsset();
   const updateAsset = useUpdateAsset();
   const deleteAsset = useDeleteAsset();
+  const createAssetGroup = useCreateAssetGroup();
 
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -52,6 +57,8 @@ export default function AssetsPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors }
   } = useForm<AssetFormValues>({
     resolver: zodResolver(assetFormSchema),
@@ -59,14 +66,25 @@ export default function AssetsPage() {
   });
 
   const assets = assetsQuery.data ?? [];
+  const assetGroups = useMemo(
+    () => assetGroupsQuery.data ?? [],
+    [assetGroupsQuery.data]
+  );
   const isSubmitting = createAsset.isPending || updateAsset.isPending;
+  const selectedGroupId = watch('groupId');
+
+  useEffect(() => {
+    if (!editingAsset && assetGroups.length && !selectedGroupId) {
+      setValue('groupId', assetGroups[0].id, { shouldValidate: true });
+    }
+  }, [assetGroups, editingAsset, selectedGroupId, setValue]);
 
   const handleEdit = (asset: Asset) => {
     setEditingAsset(asset);
     setActionError(null);
     reset({
       name: asset.name,
-      category: asset.category ?? '',
+      groupId: asset.groupId,
       currentValue: asset.currentValue
     });
   };
@@ -98,12 +116,35 @@ export default function AssetsPage() {
     }
   };
 
+  const handleAddGroup = async () => {
+    const name = window.prompt('Enter a name for the new group');
+    if (!name) {
+      return;
+    }
+
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    setActionError(null);
+
+    try {
+      const group = await createAssetGroup.mutateAsync({ name: trimmed });
+      setValue('groupId', group.id, { shouldValidate: true, shouldDirty: true });
+    } catch (error) {
+      setActionError(
+        getErrorMessage(error, 'Unable to create the group. Please try again.')
+      );
+    }
+  };
+
   const onSubmit = handleSubmit(async (values) => {
     setActionError(null);
 
     const payload = {
       name: values.name,
-      category: values.category?.trim() ? values.category.trim() : undefined,
+      groupId: values.groupId,
       currentValue: values.currentValue
     };
 
@@ -146,9 +187,47 @@ export default function AssetsPage() {
                   {errors.name ? <p className="text-xs text-rose-500">{errors.name.message}</p> : null}
                 </div>
                 <div className="flex flex-col space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Input id="category" placeholder="Investments" {...register('category')} />
-                  {errors.category ? <p className="text-xs text-rose-500">{errors.category.message}</p> : null}
+                  <Label htmlFor="groupId">Group</Label>
+                  <div className="flex items-center gap-3">
+                    <select
+                      id="groupId"
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      {...register('groupId')}
+                      disabled={assetGroupsQuery.isLoading}
+                    >
+                      <option value="" disabled>
+                        {assetGroupsQuery.isLoading ? 'Loading groups…' : 'Select a group'}
+                      </option>
+                      {assetGroups.map((group) => (
+                        <option key={group.id} value={group.id}>
+                          {group.name}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddGroup}
+                      disabled={createAssetGroup.isPending || assetGroupsQuery.isLoading}
+                    >
+                      {createAssetGroup.isPending ? (
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      ) : null}
+                      Add group
+                    </Button>
+                  </div>
+                  {errors.groupId ? (
+                    <p className="text-xs text-rose-500">{errors.groupId.message}</p>
+                  ) : null}
+                  {assetGroupsQuery.isError ? (
+                    <p className="text-xs text-rose-500">
+                      {getErrorMessage(
+                        assetGroupsQuery.error,
+                        'We could not load your groups. Please refresh to try again.'
+                      )}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
@@ -213,7 +292,7 @@ export default function AssetsPage() {
                   <thead className="text-left text-xs uppercase text-muted-foreground">
                     <tr>
                       <th className="py-2 pr-4">Name</th>
-                      <th className="py-2 pr-4">Category</th>
+                      <th className="py-2 pr-4">Group</th>
                       <th className="py-2 pr-4">Current value</th>
                       <th className="py-2 pr-4">Updated</th>
                       <th className="py-2 pr-4 text-right">Actions</th>
@@ -224,7 +303,7 @@ export default function AssetsPage() {
                       <tr key={asset.id}>
                         <td className="py-3 pr-4 font-medium">{asset.name}</td>
                         <td className="py-3 pr-4 text-muted-foreground">
-                          {asset.category ? asset.category : '-'}
+                          {asset.group?.name ?? '-'}
                         </td>
                         <td className="py-3 pr-4 font-semibold">{formatCurrency(asset.currentValue)}</td>
                         <td className="py-3 pr-4 text-muted-foreground">

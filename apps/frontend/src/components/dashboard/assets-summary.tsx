@@ -27,9 +27,7 @@ export function AssetsSummary({ assets }: AssetsSummaryProps) {
           <li key={asset.id} className="flex items-center justify-between text-sm">
             <div>
               <p className="font-medium">{asset.name}</p>
-              {asset.category ? (
-                <p className="text-xs text-muted-foreground capitalize">{asset.category}</p>
-              ) : null}
+              <p className="text-xs text-muted-foreground capitalize">{asset.group.name}</p>
             </div>
             <span className="font-semibold">
               {asset.currentValue.toLocaleString('en-US', {

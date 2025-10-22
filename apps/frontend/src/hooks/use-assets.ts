@@ -4,11 +4,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuth } from '@/contexts/auth-context';
 import { apiClient } from '@/lib/api-client';
-import type { Asset } from '@zoltraak/types';
+import type { Asset, AssetGroup } from '@zoltraak/types';
 
 type AssetPayload = {
   name: string;
-  category?: string | null;
+  groupId: string;
   currentValue: number;
 };
 
@@ -35,6 +35,16 @@ const updateAssetRequest = async ({
 
 const deleteAssetRequest = async (id: string) => {
   await apiClient.delete(`/assets/${id}`);
+};
+
+const listAssetGroups = async (): Promise<AssetGroup[]> => {
+  const response = await apiClient.get<{ data: AssetGroup[] }>('/assets/groups');
+  return response.data.data;
+};
+
+const createAssetGroupRequest = async (payload: { name: string }) => {
+  const response = await apiClient.post<{ data: AssetGroup }>('/assets/groups', payload);
+  return response.data.data;
 };
 
 export const useAssets = () => {
@@ -79,6 +89,40 @@ export const useDeleteAsset = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assets'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard', 'overview'] });
+    }
+  });
+};
+
+export const useAssetGroups = () => {
+  const { isAuthenticated, isInitializing } = useAuth();
+
+  return useQuery({
+    queryKey: ['asset-groups'],
+    queryFn: listAssetGroups,
+    enabled: isAuthenticated && !isInitializing,
+    staleTime: 1000 * 60 * 5
+  });
+};
+
+export const useCreateAssetGroup = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createAssetGroupRequest,
+    onSuccess: (group) => {
+      queryClient.setQueryData<AssetGroup[]>(['asset-groups'], (previous) => {
+        const base = previous ?? [];
+        const existing = base.find((item) => item.id === group.id);
+        const updated = existing
+          ? base.map((item) => (item.id === group.id ? group : item))
+          : [...base, group];
+
+        return updated.sort((a, b) => {
+          const createdDiff =
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return createdDiff !== 0 ? createdDiff : a.name.localeCompare(b.name);
+        });
+      });
     }
   });
 };
