@@ -32,15 +32,16 @@ export function DashboardOverview() {
   return (
     <div className="space-y-6">
       <OverviewCards totals={data.totals} />
-      <div className="grid gap-5 xl:grid-cols-[2fr_1fr]">
+      <div className="grid gap-5 xl:grid-cols-[3fr_1fr_1fr]">
         <CashflowChart transactions={data.recentTransactions} />
         <SpendingCategories transactions={data.recentTransactions} />
+        <RecentTransactions transactions={data.recentTransactions} />
       </div>
       <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
-        <RecentTransactions transactions={data.recentTransactions} />
         <AssetsSummary assets={data.assets} />
+        <BudgetsSummary budgets={data.budgets} />
       </div>
-      <BudgetsSummary budgets={data.budgets} />
+      
     </div>
   );
 }
