@@ -89,47 +89,66 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      <aside className="flex w-full max-w-xs flex-col border-r bg-card/60 px-4 py-6 backdrop-blur lg:max-w-sm">
-        <div className="flex items-center justify-between gap-2 rounded-xl border border-border/60 bg-card px-3 py-3 shadow-sm">
+    <div className="flex min-h-screen overflow-hidden bg-background text-foreground dark:bg-[#0f1219] dark:text-slate-100">
+      <aside className="hidden min-h-screen w-[280px] flex-col border-r border-border bg-muted/30 px-6 py-8 dark:border-white/5 dark:bg-[#131722] xl:flex">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 dark:border-white/5 dark:bg-[#1b2030]">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <span>ZK</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-sm font-semibold text-foreground dark:bg-[#2b3142] dark:text-slate-200">
+              ZK
             </div>
             <div>
-              <span className="block text-base font-semibold leading-tight">Zoltraak</span>
-              <span className="block text-xs text-muted-foreground">Financial Buddy</span>
+              <span className="block text-base font-semibold leading-tight">
+                Zoltraak
+              </span>
+              <span className="block text-xs text-muted-foreground dark:text-slate-400">
+                Financial intelligence
+              </span>
             </div>
           </Link>
           <ThemeToggle />
         </div>
 
-        <nav className="mt-8 flex-1 space-y-1">
+        <div className="mt-10 space-y-4 text-xs text-muted-foreground dark:text-slate-400">
+          <p className="rounded-xl border border-border bg-card px-4 py-3 dark:border-white/5 dark:bg-[#181d2b]">
+            Keep your workspace secure by enabling multi-factor authentication in settings.
+          </p>
+        </div>
+
+        <nav className="mt-8 flex-1 space-y-1 text-sm">
           {navItems.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center gap-3 rounded-xl px-3 py-2 font-medium transition-colors',
                 activePath === href
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'border border-border bg-card/70 text-foreground shadow-sm dark:border-white/5 dark:bg-[#1f2534] dark:text-slate-100'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-400 dark:hover:bg-[#1b2030] dark:hover:text-slate-100'
               )}
             >
-              <Icon className="h-4 w-4" />
+              <span
+                className={cn(
+                  'flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-muted dark:border-white/5 dark:bg-[#1d2230]',
+                  activePath === href && 'border-foreground/30 text-foreground dark:border-white/10 dark:text-slate-100'
+                )}
+              >
+                <Icon className="h-4 w-4" />
+              </span>
               {label}
             </Link>
           ))}
         </nav>
 
-        <div className="mt-8 rounded-xl border border-border/60 bg-card/90 p-4 shadow-sm">
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-foreground">
+        <div className="mt-auto rounded-2xl border border-border bg-card p-4 dark:border-white/5 dark:bg-[#181e2b]">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">
               {user?.displayName ?? user?.email ?? 'Account'}
             </p>
-            {user?.email ? <p className="text-xs text-muted-foreground">{user.email}</p> : null}
+            {user?.email ? <p className="text-xs text-muted-foreground dark:text-slate-400">{user.email}</p> : null}
             {user?.role ? (
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">{user.role.toLowerCase()}</p>
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground/70 dark:text-slate-500">
+                {user.role.toLowerCase()}
+              </p>
             ) : null}
           </div>
           <div className="mt-4 flex flex-col gap-2">
@@ -137,20 +156,57 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               href="/settings"
               className={cn(
                 buttonVariants({ variant: 'secondary', size: 'sm' }),
-                'w-full justify-center border border-transparent'
+                'w-full justify-center border border-border bg-transparent text-foreground hover:bg-muted/70 dark:border-white/5 dark:text-slate-100 dark:hover:bg-white/10'
               )}
             >
               Settings
             </Link>
-            <LogoutButton className="w-full justify-center" variant="outline">
+            <LogoutButton
+              className="w-full justify-center border border-border text-foreground hover:bg-muted/70 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/10"
+              variant="outline"
+            >
               Logout
             </LogoutButton>
           </div>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">{children}</div>
+      <main className="relative flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+          <div className="xl:hidden">
+            <div className="rounded-2xl border border-border bg-card p-4 dark:border-white/5 dark:bg-[#161b26]">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-sm font-semibold text-foreground dark:bg-[#2b3142] dark:text-slate-200">
+                  ZK
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">
+                    {user?.displayName ?? user?.email ?? 'Zoltraak'}
+                  </p>
+                  <p className="text-xs text-muted-foreground dark:text-slate-400">Finance command center</p>
+                </div>
+              </div>
+              <div className="mt-4 flex gap-2 overflow-x-auto">
+                {navItems.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      'whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide transition',
+                      pathname.startsWith(href)
+                        ? 'border-foreground/30 bg-muted/80 text-foreground dark:border-white/10 dark:bg-white/10 dark:text-slate-100'
+                        : 'border-border bg-transparent text-muted-foreground hover:bg-muted/70 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10'
+                    )}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {children}
+        </div>
       </main>
 
       <CurrencyModal

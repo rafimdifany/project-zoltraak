@@ -200,32 +200,39 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
   );
 
   return (
-    <div className="min-w-0 w-full rounded-2xl border bg-card p-6 shadow-sm">
+    <div className="min-w-0 w-full rounded-3xl border border-border bg-card p-6 dark:border-white/5 dark:bg-[#141924] sm:p-8">
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h2 className="text-lg font-semibold">Cashflow (last {rangeDays} days)</h2>
-          <p className="text-sm text-muted-foreground">
-            Income vs expenses aggregated by day. Keep an eye on spending spikes.
+          <p className="text-xs uppercase tracking-[0.35em] text-blue-300/70">Cashflow</p>
+          <h2 className="mt-2 text-2xl font-semibold text-foreground dark:text-slate-100">
+            Last {rangeDays} day performance
+          </h2>
+          <p className="text-sm text-muted-foreground dark:text-slate-400">
+            Monitor the balance between earnings and outflows. Spot emerging trends instantly.
           </p>
         </div>
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-6 rounded-2xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground dark:border-white/5 dark:bg-[#161d29] dark:text-slate-200">
           <div>
-            <p className="text-muted-foreground">Income</p>
-            <p className="text-base font-semibold text-emerald-500">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground dark:text-slate-400">Income</p>
+            <p className="text-base font-semibold text-emerald-300">
               {formatCurrency(totalIncome)}
             </p>
           </div>
+          <div className="h-10 w-px bg-white/10" />
           <div>
-            <p className="text-muted-foreground">Expense</p>
-            <p className="text-base font-semibold text-rose-500">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground dark:text-slate-400">Expenses</p>
+            <p className="text-base font-semibold text-rose-300">
               {formatCurrency(totalExpense)}
             </p>
           </div>
+          <div className="h-10 w-px bg-white/10" />
           <div>
-            <p className="text-muted-foreground">Net</p>
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground dark:text-slate-400">Net</p>
             <p
-              className="text-base font-semibold"
-              style={{ color: net >= 0 ? 'rgb(34 197 94)' : 'rgb(239 68 68)' }}
+              className={cn(
+                'text-base font-semibold',
+                net >= 0 ? 'text-emerald-300' : 'text-rose-300'
+              )}
             >
               {formatCurrency(net)}
             </p>
@@ -234,8 +241,8 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
       </div>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="hidden h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent md:block" />
-        <div className="flex items-center gap-2 rounded-full border bg-background px-1 py-1 text-xs shadow-sm">
+          <div className="hidden h-px flex-1 bg-muted-foreground/30 dark:bg-white/10 md:block" />
+        <div className="flex items-center gap-2 rounded-full border border-border bg-muted px-1 py-1 text-xs text-muted-foreground dark:border-white/10 dark:bg-[#1a202c] dark:text-slate-300">
           {RANGE_OPTIONS.map((option) => (
             <button
               key={option.value}
@@ -243,8 +250,8 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
               onClick={() => setRangeDays(option.value)}
               className={`rounded-full px-3 py-1 font-medium transition ${
                 option.value === rangeDays
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted/60'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-[0_20px_45px_-25px_rgba(37,99,235,0.7)]'
+                  : 'text-slate-300 hover:bg-white/10'
               }`}
             >
               {option.label}
@@ -284,7 +291,7 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
                 type="button"
                 className={cn(
                   'relative flex flex-col items-center gap-3 rounded-lg outline-none transition',
-                  'focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2'
+                  'focus-visible:ring-2 focus-visible:ring-blue-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950'
                 )}
                 onMouseEnter={(event) => showTooltip(index, point, event.currentTarget)}
                 onMouseMove={(event) => showTooltip(index, point, event.currentTarget)}
@@ -294,28 +301,30 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
               >
                 <div
                   className={cn(
-                    'flex h-40 w-full items-end gap-3 rounded-xl border border-border/40 px-3 py-4 transition',
-                    isHovered ? 'bg-muted/40' : 'bg-muted/20'
+                    'flex h-40 w-full items-end gap-3 rounded-xl border border-border px-3 py-4 transition dark:border-white/5',
+                    isHovered
+                      ? 'border-foreground/30 bg-muted/80 dark:border-white/10 dark:bg-[#1c2231]'
+                      : 'bg-muted dark:bg-[#1a1f2c]'
                   )}
                 >
-                  <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-emerald-500/20">
+                  <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-emerald-500/10">
                     <div
-                      className="w-full rounded-lg bg-emerald-500 transition-all duration-300"
+                      className="w-full rounded-lg bg-gradient-to-b from-emerald-400 to-emerald-600 transition-all duration-300"
                       style={{ height: `${(point.income / maxValue) * 100}%` }}
                       aria-label={`Income ${formatCurrency(point.income)}`}
                     />
                   </div>
-                  <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-rose-500/20">
+                  <div className="flex h-full flex-1 items-end overflow-hidden rounded-lg bg-rose-500/10">
                     <div
-                      className="w-full rounded-lg bg-rose-500 transition-all duration-300"
+                      className="w-full rounded-lg bg-gradient-to-b from-rose-400 to-rose-600 transition-all duration-300"
                       style={{ height: `${(point.expense / maxValue) * 100}%` }}
                       aria-label={`Expense ${formatCurrency(point.expense)}`}
                     />
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs font-semibold uppercase text-muted-foreground">{point.label}</p>
-                  <p className="text-[11px] text-muted-foreground/80">{point.dateLabel}</p>
+                  <p className="text-xs font-semibold uppercase text-slate-300">{point.label}</p>
+                  <p className="text-[11px] text-muted-foreground dark:text-slate-400/80">{point.dateLabel}</p>
                 </div>
               </button>
             );
@@ -326,27 +335,27 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
       {tooltip && typeof document !== 'undefined'
         ? createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] w-56 -translate-x-1/2 -translate-y-full rounded-lg border border-border/60 bg-card p-3 text-xs shadow-lg dark:bg-slate-900"
+              className="pointer-events-none fixed z-[9999] w-56 -translate-x-1/2 -translate-y-full rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground dark:border-white/10 dark:bg-[#161c28] dark:text-slate-200"
               style={{
                 left: tooltip.x,
                 top: tooltip.y - 12
               }}
             >
-              <p className="text-[11px] font-semibold uppercase text-muted-foreground">{tooltip.dateLabel}</p>
+              <p className="text-[11px] font-semibold uppercase text-muted-foreground dark:text-slate-400">{tooltip.dateLabel}</p>
               <div className="mt-2 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-emerald-500">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  <span className="flex items-center gap-2 text-emerald-300">
+                    <span className="h-2 w-2 rounded-full bg-emerald-300" />
                     Income
                   </span>
-                  <span className="font-medium text-foreground">{formatCurrency(tooltip.income)}</span>
+                  <span className="font-medium text-foreground dark:text-slate-100">{formatCurrency(tooltip.income)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-rose-500">
-                    <span className="h-2 w-2 rounded-full bg-rose-500" />
+                  <span className="flex items-center gap-2 text-rose-300">
+                    <span className="h-2 w-2 rounded-full bg-rose-300" />
                     Expense
                   </span>
-                  <span className="font-medium text-foreground">{formatCurrency(tooltip.expense)}</span>
+                  <span className="font-medium text-foreground dark:text-slate-100">{formatCurrency(tooltip.expense)}</span>
                 </div>
               </div>
             </div>,
@@ -354,16 +363,16 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
           )
         : null}
 
-      <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+      <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground dark:text-slate-400">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_4px_rgba(16,185,129,0.18)]" />
           Income
         </div>
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-rose-500" />
+          <span className="h-2 w-2 rounded-full bg-rose-400 shadow-[0_0_0_4px_rgba(244,63,94,0.18)]" />
           Expenses
         </div>
-        <p className="ml-auto text-muted-foreground/70">
+        <p className="ml-auto text-slate-500">
           Values update automatically as new transactions sync.
         </p>
       </div>

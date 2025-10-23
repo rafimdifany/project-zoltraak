@@ -15,22 +15,22 @@ export function DashboardOverview() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[240px] items-center justify-center rounded-2xl border bg-card">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <div className="flex min-h-[320px] items-center justify-center rounded-3xl border border-border bg-card dark:border-white/5 dark:bg-[#141924]">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground dark:text-slate-300" />
       </div>
     );
   }
 
   if (isError || !data) {
     return (
-      <div className="rounded-2xl border bg-card p-6 text-center text-sm text-rose-500">
+      <div className="rounded-3xl border border-border bg-card p-6 text-center text-sm text-rose-500 dark:border-white/5 dark:bg-[#141924] dark:text-rose-300">
         Something went wrong while loading your dashboard. Try again shortly.
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <OverviewCards totals={data.totals} />
       <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
         <CashflowChart transactions={data.recentTransactions} />
