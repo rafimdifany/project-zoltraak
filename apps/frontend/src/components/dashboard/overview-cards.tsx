@@ -66,7 +66,6 @@ export function OverviewCards({ totals }: OverviewCardsProps) {
               'group relative overflow-hidden rounded-3xl border border-border bg-card p-5 transition dark:border-white/5 dark:bg-[#141924]'
             )}
           >
-            <div className="absolute inset-px rounded-[22px] border border-border/70 group-hover:border-border dark:border-white/5 dark:group-hover:border-white/10" />
             <div className="relative flex items-start gap-4">
               <div className="min-w-0 flex-1">
                 <p className="text-xs uppercase tracking-widest text-muted-foreground dark:text-slate-400">
