@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useBudgets } from '@/hooks/use-budgets';
+import { useCategories } from '@/hooks/use-categories';
 import { useCurrencyFormatter } from '@/hooks/use-currency';
 import {
   useCreateTransaction,
@@ -19,7 +20,7 @@ import {
   useUpdateTransaction
 } from '@/hooks/use-transactions';
 import { getErrorMessage } from '@/lib/http-error';
-import type { Transaction } from '@zoltraak/types';
+import type { Category, Transaction } from '@zoltraak/types';
 
 const transactionFormSchema = z.object({
   type: z.enum(['INCOME', 'EXPENSE']),
@@ -52,10 +53,33 @@ const createDefaultValues = (): TransactionFormValues => ({
 export default function TransactionsPage() {
   const transactionsQuery = useTransactions();
   const budgetsQuery = useBudgets();
+  const categoriesQuery = useCategories();
   const createTransaction = useCreateTransaction();
   const updateTransaction = useUpdateTransaction();
   const deleteTransaction = useDeleteTransaction();
   const { format: formatCurrency } = useCurrencyFormatter();
+
+  const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
+  const categoryOptionsByType = useMemo(() => {
+    const options: Record<'INCOME' | 'EXPENSE', { value: string; label: string }[]> = {
+      INCOME: [],
+      EXPENSE: []
+    };
+
+    const traverse = (nodes: Category[], prefix?: string) => {
+      nodes.forEach((node) => {
+        const label = prefix ? `${prefix} / ${node.name}` : node.name;
+        options[node.type].push({ value: label, label });
+
+        if (node.subcategories.length) {
+          traverse(node.subcategories, label);
+        }
+      });
+    };
+
+    traverse(categories);
+    return options;
+  }, [categories]);
 
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -65,11 +89,35 @@ export default function TransactionsPage() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors }
   } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: createDefaultValues()
   });
+
+  const selectedTransactionType = watch('type') ?? 'EXPENSE';
+
+  const categoryOptionsWithFallback = useMemo(() => {
+    const baseOptions = categoryOptionsByType[selectedTransactionType] ?? [];
+
+    if (!editingTransaction || !editingTransaction.category) {
+      return baseOptions;
+    }
+
+    const exists = baseOptions.some(
+      (option) => option.value === editingTransaction.category
+    );
+
+    if (exists) {
+      return baseOptions;
+    }
+
+    return [
+      ...baseOptions,
+      { value: editingTransaction.category, label: editingTransaction.category }
+    ];
+  }, [categoryOptionsByType, editingTransaction, selectedTransactionType]);
 
   const budgets = useMemo(() => budgetsQuery.data ?? [], [budgetsQuery.data]);
   const budgetLookup = useMemo(() => new Map(budgets.map((budget) => [budget.id, budget.name])), [budgets]);
@@ -174,10 +222,32 @@ export default function TransactionsPage() {
                 </div>
                 <div className="flex flex-col space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Input id="category" placeholder="Software subscriptions" {...register('category')} />
+                  <select
+                    id="category"
+                    className="h-10 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
+                    {...register('category')}
+                    disabled={categoriesQuery.isLoading}
+                  >
+                    <option value="">Select a category</option>
+                    {categoryOptionsWithFallback.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                   {errors.category ? (
                     <p className="text-xs text-rose-500">{errors.category.message}</p>
-                  ) : null}
+                  ) : categoriesQuery.isLoading ? (
+                    <p className="text-xs text-muted-foreground">Loading categories...</p>
+                  ) : categoryOptionsWithFallback.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      Create categories under Categories to make selection easier.
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Select a {selectedTransactionType === 'INCOME' ? 'income' : 'expense'} category or subcategory from your library.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -353,3 +423,6 @@ export default function TransactionsPage() {
     </section>
   );
 }
+
+
+

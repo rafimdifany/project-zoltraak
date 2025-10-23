@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutDashboard, Loader2, PiggyBank, Receipt, Wallet } from 'lucide-react';
+import { FolderTree, LayoutDashboard, Loader2, PiggyBank, Receipt, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -19,10 +19,11 @@ type AppShellProps = {
 };
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
   { href: '/transactions', label: 'Transactions', icon: Receipt },
   { href: '/budgets', label: 'Budgets', icon: PiggyBank },
-  { href: '/assets', label: 'Assets', icon: Wallet }
+  { href: '/assets', label: 'Assets', icon: Wallet },
+  { href: '/categories', label: 'Categories', icon: FolderTree }
 ];
 
 export function AppShell({ children }: AppShellProps) {

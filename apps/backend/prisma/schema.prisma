@@ -21,6 +21,7 @@ model User {
   budgets      Budget[]
   assets       Asset[]
   assetGroups  AssetGroup[]
+  categories   Category[]
 }
 
 model Transaction {
@@ -79,6 +80,23 @@ model AssetGroup {
   @@unique([userId, name])
 }
 
+model Category {
+  id        String    @id @default(uuid())
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+  parent    Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  parentId  String?
+  children  Category[] @relation("CategoryHierarchy")
+  name      String
+  type      CategoryType
+  isDefault Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, type, parentId, name])
+  @@index([userId, type, parentId])
+}
+
 enum UserRole {
   USER
   PREMIUM
@@ -90,6 +108,10 @@ enum TransactionType {
   EXPENSE
 }
 
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
 enum CurrencyCode {
   USD
   SGD
