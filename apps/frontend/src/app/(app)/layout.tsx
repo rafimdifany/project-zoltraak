@@ -90,8 +90,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen overflow-hidden bg-background text-foreground dark:bg-[#0f1219] dark:text-slate-100">
-      <aside className="hidden min-h-screen w-[280px] flex-col border-r border-border bg-muted/30 px-6 py-8 dark:border-white/5 dark:bg-[#131722] xl:flex">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 dark:border-white/5 dark:bg-[#1b2030]">
+      <aside className="relative hidden min-h-screen w-[280px] flex-col border-r border-border bg-muted/30 px-6 py-8 dark:border-white/5 dark:bg-[#131722] xl:flex">
+        <div className="sticky top-0 z-10 -mx-6 -mt-8 flex items-center justify-between gap-3 border-b border-border/60 bg-muted/30 px-6 pb-4 pt-8 backdrop-blur-sm dark:border-white/10 dark:bg-[#131722]">
           <Link href="/dashboard" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-sm font-semibold text-foreground dark:bg-[#2b3142] dark:text-slate-200">
               ZK
@@ -108,13 +108,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           <ThemeToggle />
         </div>
 
-        <div className="mt-10 space-y-4 text-xs text-muted-foreground dark:text-slate-400">
+        <div className="mt-6 space-y-4 text-xs text-muted-foreground dark:text-slate-400">
           <p className="rounded-xl border border-border bg-card px-4 py-3 dark:border-white/5 dark:bg-[#181d2b]">
             Keep your workspace secure by enabling multi-factor authentication in settings.
           </p>
         </div>
 
-        <nav className="mt-8 flex-1 space-y-1 text-sm">
+        <nav className="mt-6 flex-1 space-y-1 text-sm">
           {navItems.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
@@ -139,7 +139,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <div className="mt-auto rounded-2xl border border-border bg-card p-4 dark:border-white/5 dark:bg-[#181e2b]">
+        <div className="sticky bottom-0 z-10 -mx-6 -mb-8 mt-6 border-t border-border/60 bg-muted/30 px-6 pb-8 pt-4 dark:border-white/10 dark:bg-[#131722]">
           <div className="space-y-2">
             <p className="text-sm font-semibold">
               {user?.displayName ?? user?.email ?? 'Account'}
@@ -156,13 +156,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               href="/settings"
               className={cn(
                 buttonVariants({ variant: 'secondary', size: 'sm' }),
-                'w-full justify-center border border-border bg-transparent text-foreground hover:bg-muted/70 dark:border-white/5 dark:text-slate-100 dark:hover:bg-white/10'
+                'w-full justify-center border border-border/70 bg-transparent text-foreground hover:bg-muted/70 dark:border-white/10 dark:text-slate-100 dark:hover:bg-white/10'
               )}
             >
               Settings
             </Link>
             <LogoutButton
-              className="w-full justify-center border border-border text-foreground hover:bg-muted/70 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/10"
+              className="w-full justify-center border border-border/70 text-foreground hover:bg-muted/70 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/10"
               variant="outline"
             >
               Logout
