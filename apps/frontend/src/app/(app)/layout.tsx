@@ -171,8 +171,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="relative flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <main className="relative flex-1 overflow-y-auto px-3 py-6 sm:px-4 lg:px-5 xl:px-6">
+        <div className="flex w-full flex-col gap-5">
           <div className="xl:hidden">
             <div className="rounded-2xl border border-border bg-card p-4 dark:border-white/5 dark:bg-[#161b26]">
               <div className="flex items-center gap-3">

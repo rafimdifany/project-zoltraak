@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic';
 
 export default function DashboardPage() {
   return (
-    <section className="space-y-8">
-      <div className="rounded-3xl border border-border bg-card px-6 py-6 dark:border-white/5 dark:bg-[#141924] sm:px-8">
+    <section className="space-y-6">
+      <div className="rounded-3xl border border-border bg-card px-5 py-5 dark:border-white/5 dark:bg-[#141924] sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground dark:text-slate-400">
@@ -40,7 +40,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex gap-2">
             {segments.map((segment) => (
               <button
