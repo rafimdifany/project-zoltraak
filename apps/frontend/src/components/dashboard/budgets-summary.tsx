@@ -53,11 +53,12 @@ export function BudgetsSummary({ budgets }: BudgetsSummaryProps) {
                   {format(budget.spent)}/{format(budget.targetAmount)}
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-muted-foreground/20 dark:bg-white/10">
+              <div className="h-2 rounded-full bg-muted-foreground/20 dark:bg-white/15">
                 <div
                   className={cn(
-                    'h-2 rounded-full bg-primary/60 dark:bg-[#2b3142]',
-                    progress > 90 && 'bg-rose-500/70 dark:bg-[#3b222b]'
+                    'h-full rounded-full bg-primary/70 shadow-[0_0_8px_rgba(59,130,246,0.35)] dark:bg-blue-400 dark:shadow-[0_0_10px_rgba(96,165,250,0.45)]',
+                    progress > 90 &&
+                      'bg-rose-500/80 shadow-[0_0_10px_rgba(244,63,94,0.35)] dark:bg-rose-400 dark:shadow-[0_0_12px_rgba(246,113,160,0.5)]'
                   )}
                   style={{ width: `${progress}%` }}
                 />

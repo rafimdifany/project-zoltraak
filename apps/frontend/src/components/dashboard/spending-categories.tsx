@@ -66,9 +66,9 @@ export function SpendingCategories({ transactions }: SpendingCategoriesProps) {
                 </div>
                 <p className="text-xs text-muted-foreground dark:text-slate-400">{percent}% of spend</p>
               </div>
-              <div className="h-2 rounded-full bg-muted-foreground/20 dark:bg-white/10">
+              <div className="h-2 rounded-full bg-muted-foreground/20 dark:bg-white/15">
                 <div
-                  className="h-full rounded-full bg-rose-400/80 dark:bg-[#3b222b]"
+                  className="h-full rounded-full bg-rose-400/90 shadow-[0_0_8px_rgba(251,113,133,0.35)] dark:bg-rose-400 dark:shadow-[0_0_8px_rgba(251,113,133,0.45)]"
                   style={{ width: `${safePercent}%` }}
                 />
               </div>
