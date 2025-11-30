@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { FolderTree, LayoutDashboard, Loader2, PiggyBank, Receipt, Wallet } from 'lucide-react';
+import { ChevronDown, FolderTree, LayoutDashboard, ListTodo, Loader2, PiggyBank, Receipt, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -16,13 +16,14 @@ import { getErrorMessage } from '@/lib/http-error';
 import { cn } from '@/lib/utils';
 import type { CurrencyCode } from '@zoltraak/types';
 
-const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+const primaryNav = [{ href: '/dashboard', label: 'Overview', icon: LayoutDashboard }];
+const financialNav = [
   { href: '/transactions', label: 'Transactions', icon: Receipt },
   { href: '/budgets', label: 'Budgets', icon: PiggyBank },
   { href: '/assets', label: 'Assets', icon: Wallet },
   { href: '/categories', label: 'Categories', icon: FolderTree }
 ];
+const secondaryNav = [{ href: '/todo-list', label: 'Todo List', icon: ListTodo }];
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -73,9 +74,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     if (!pathname) {
       return '/dashboard';
     }
-    const match = navItems.find((item) => pathname.startsWith(item.href));
+    const match = [...primaryNav, ...financialNav, ...secondaryNav].find((item) => pathname.startsWith(item.href));
     return match?.href ?? '/dashboard';
   }, [pathname]);
+  const [isFinancialOpen, setIsFinancialOpen] = useState(true);
 
   if (isInitializing) {
     return (
@@ -116,25 +118,75 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="mt-6 flex-1 space-y-1 text-sm">
-          {navItems.map(({ href, label, icon: Icon }) => (
+          {primaryNav.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               className={cn(
                 'flex items-center gap-3 rounded-xl px-3 py-2 font-medium transition-colors',
                 activePath === href
-                  ? 'border border-border bg-card/70 text-foreground shadow-sm dark:border-white/5 dark:bg-[#1f2534] dark:text-slate-100'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-400 dark:hover:bg-[#1b2030] dark:hover:text-slate-100'
               )}
             >
-              <span
+              <Icon className="h-4 w-4" />
+              {label}
+            </Link>
+          ))}
+
+          <button
+            type="button"
+            className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-muted/70 dark:text-slate-100 dark:hover:bg-[#1b2030]"
+            onClick={() => setIsFinancialOpen((prev) => !prev)}
+            aria-expanded={isFinancialOpen}
+          >
+            <span className="flex items-center gap-3">
+              <Wallet className="h-4 w-4" />
+              Financial
+            </span>
+            <ChevronDown
+              className={cn(
+                'h-4 w-4 text-muted-foreground transition-transform',
+                isFinancialOpen ? 'rotate-180' : ''
+              )}
+            />
+          </button>
+
+          <div
+            className={cn(
+              'flex flex-col gap-1 pl-6 overflow-hidden transition-all duration-500 ease-in-out',
+              isFinancialOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            )}
+          >
+            {financialNav.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
                 className={cn(
-                  'flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-muted dark:border-white/5 dark:bg-[#1d2230]',
-                  activePath === href && 'border-foreground/30 text-foreground dark:border-white/10 dark:text-slate-100'
+                  'flex items-center gap-3 rounded-xl px-3 py-2 font-medium transition-colors',
+                  activePath === href
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-400 dark:hover:bg-[#1b2030] dark:hover:text-slate-100'
                 )}
               >
                 <Icon className="h-4 w-4" />
-              </span>
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {secondaryNav.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                'flex items-center gap-3 rounded-xl px-3 py-2 font-medium transition-colors',
+                activePath === href
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground dark:text-slate-400 dark:hover:bg-[#1b2030] dark:hover:text-slate-100'
+              )}
+            >
+              <Icon className="h-4 w-4" />
               {label}
             </Link>
           ))}
@@ -188,7 +240,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
               <div className="mt-4 flex gap-2 overflow-x-auto">
-                {navItems.map(({ href, label }) => (
+                {[...primaryNav, ...financialNav, ...secondaryNav].map(({ href, label }) => (
                   <Link
                     key={href}
                     href={href}
