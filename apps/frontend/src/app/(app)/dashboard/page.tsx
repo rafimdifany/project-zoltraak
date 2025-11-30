@@ -3,8 +3,6 @@ import { ArrowUpRight, CalendarDays, Download } from 'lucide-react';
 import { DashboardOverview } from '@/components/dashboard/dashboard-overview';
 import { Button } from '@/components/ui/button';
 
-const segments = ['Overview', 'Budgets', 'Assets'];
-
 export const dynamic = 'force-dynamic';
 
 export default function DashboardPage() {

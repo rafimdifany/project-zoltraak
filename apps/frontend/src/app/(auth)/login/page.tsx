@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { PasswordInput } from '@/components/password-input';
 import { useAuth } from '@/contexts/auth-context';
 import { useLogin } from '@/hooks/use-auth';
 import { getErrorMessage } from '@/lib/http-error';
@@ -143,7 +144,7 @@ export default function LoginPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" placeholder="••••••••" {...register('password')} />
+                  <PasswordInput id="password" placeholder="••••••••" {...register('password')} />
                   {errors.password ? <p className="text-xs text-rose-500">{errors.password.message}</p> : null}
                 </div>
               </form>

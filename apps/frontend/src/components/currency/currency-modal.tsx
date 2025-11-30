@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { CurrencyCode } from '@zoltraak/types';
-import { currencyOptions, type CurrencyOption } from './currency-options';
+import { currencyOptions } from './currency-options';
 
 type CurrencyModalProps = {
   isOpen: boolean;

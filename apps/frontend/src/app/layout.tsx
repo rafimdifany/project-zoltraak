@@ -1,11 +1,8 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import Script from 'next/script';
 
 import { Providers } from './providers';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 const themeInitScript = `
 (() => {
@@ -41,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {themeInitScript}
         </Script>
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -174,7 +174,7 @@ export function CashflowChart({ transactions }: CashflowChartProps) {
   }, []);
 
   const endDrag = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
+    () => {
       const container = scrollContainerRef.current;
       if (!container || !dragStateRef.current.isDragging) {
         return;

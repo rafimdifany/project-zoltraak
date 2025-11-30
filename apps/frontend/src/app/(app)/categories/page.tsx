@@ -77,7 +77,6 @@ export default function CategoriesPage() {
     register: registerCategory,
     handleSubmit: handleSubmitCategory,
     reset: resetCategoryForm,
-    watch: watchCategoryForm,
     formState: { errors: categoryErrors }
   } = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
@@ -94,7 +93,7 @@ export default function CategoriesPage() {
     defaultValues: createSubcategoryDefaults()
   });
 
-  const categories = categoriesQuery.data ?? [];
+  const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
   const rootCategories = useMemo(() => getParentCategories(categories), [categories]);
   const rootCategoriesByType = useMemo(
     () => ({
@@ -104,7 +103,6 @@ export default function CategoriesPage() {
     [rootCategories]
   );
   const flattenedCategories = useMemo(() => flattenCategories(categories), [categories]);
-  const selectedCategoryType = watchCategoryForm('type') ?? 'EXPENSE';
   const incomeRootCount = rootCategoriesByType.INCOME.length;
   const expenseRootCount = rootCategoriesByType.EXPENSE.length;
   const rootCategoryTotal = rootCategories.length;
@@ -446,8 +444,6 @@ export default function CategoriesPage() {
     </section>
   );
 }
-
-
 
 
 

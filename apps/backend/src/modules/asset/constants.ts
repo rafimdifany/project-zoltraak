@@ -7,4 +7,5 @@ export const DEFAULT_ASSET_GROUPS = [
   'Insurance'
 ] as const;
 
-export const DEFAULT_ASSET_GROUP_SET = new Set(DEFAULT_ASSET_GROUPS);
+// Widen the set type so membership checks accept arbitrary user input strings.
+export const DEFAULT_ASSET_GROUP_SET = new Set<string>(DEFAULT_ASSET_GROUPS);
